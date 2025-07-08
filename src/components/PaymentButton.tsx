@@ -20,7 +20,7 @@ declare global {
 
 const PaymentButton = ({
 }: {
-}) => {
+    }) => {
     const btnId = useId();
 
     const [isIniting, setIsIniting] = useState(true);
@@ -34,14 +34,73 @@ const PaymentButton = ({
 
         setIsLoading(true);
 
-        let paymentToken: string | boolean = "42b79b8f-9833-493b-a598-812356dcef23"; // TODO replace
+        let paymentToken: string | boolean = "0be52e68-5df9-4f06-8726-9ed9db259dd6"; // TODO replace
+
+        const apiUrl = 'http://localhost:9000/api/v1.0/orders';
+        const apiKey = '0ydVp7HyU3QY6iIAIVoPFajhdqRENG0RoatHaWGe4MnclqIqU4iu82aYpHfemph3lcR9Fru1ug24KbsUpOu7HWTYT5lInsaRK1JG0XookpjI5xwk2Jrmt4TVxRo67wx8';
+
+        const requestBody = {
+            "amount": 6,
+            "subtotal": 5,
+            "shipping_name": "FedEx",
+            "shipping_fee": 1,
+            "order_lines": [
+                {
+                    "quantity": 1,
+                    "sku": "abc",
+                    "default_price": 3,
+                    "product_title": "Sample Product",
+                    "image_url": "/sample-product.jpg",
+                    "compared_price": 6,
+                    "discount_value": 1,
+                    "properties": [
+                        { "key": "color", "value": "blue" },
+                        { "key": "size", "value": "xl" }
+                    ]
+                },
+                {
+                    "quantity": 1,
+                    "sku": "abc",
+                    "default_price": 2,
+                    "product_title": "Sample Product",
+                    "image_url": "/sample-product.jpg",
+                    "compared_price": 6,
+                    "discount_value": 1,
+                    "properties": [
+                        { "key": "color", "value": "blue" },
+                        { "key": "size", "value": "xl" }
+                    ]
+                }
+            ]
+        };
 
         try {
-            // TODO create order and return payment token
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'api-key': apiKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
+            }
+            const data = await response.json();
+            console.log('API Response:', data);
+            if (data && data.payment_token) {
+                // TODO handle payment_token
+                // if (data.payment_token && data.status == "AWAITING_CAPTURE") {
+                //     return data.payment_token;
+                //     paymentToken = data.payment_token;
+                // }
+                paymentToken = data.payment_token;
+            }
         } catch (error) {
-            console.error("Error on approve:", error);
+            console.error('Error calling API:', error);
         } finally {
-            // setIsLoading(false);
+            setIsLoading(false);
         }
 
         if (!paymentToken) {
@@ -73,23 +132,32 @@ const PaymentButton = ({
         // TODO
     }
 
-    const merchantId = "72c52373-89fc-4dc4-9c3c-50e21181310e"; // TODO replace
+    const merchantId = "8cb7d434-83a7-46f5-acf7-a38426585543"; // TODO replace
 
     function initPayment() {
-        if (!window.onecheckout) {
-            const paymentSrc = `http://localhost:3000/sdk.js?merchant_id=${merchantId}`;
-            const script = document.createElement('script')
-            script.setAttribute('src', paymentSrc)
-            document.head.appendChild(script)
+        if (typeof window === "undefined") {
+            console.error("Window is not defined. This component should only be used in a browser environment.");
+            return
         }
 
-        const interval = setInterval(() => {
-            if (!window.onecheckout) {
-                clearInterval(interval)
-                return // TODO handle
-            }
+        if (window.onecheckout) {
+            console.log('Onecheckout script already loaded');
+            setIsIniting(false);
+            // make sure right merchant of loaded onecheckout script
+            return;
+        }
 
-            setIsIniting(false)
+        const paymentSrc = `http://localhost:3000/sdk.js?merchant_id=${merchantId}`;
+        const script = document.createElement('script')
+        script.setAttribute('src', paymentSrc)
+        document.head.appendChild(script)
+
+        const paymentBtnf = function () {
+            if (!window.onecheckout) {
+                console.error("PayPal SDK not loaded");
+                // TODO handle
+                return
+            }
 
             const style = {
                 color: 'gold',
@@ -101,18 +169,25 @@ const PaymentButton = ({
                 fundingicons: 'false'
             }
 
-            window.onecheckout
-                .Buttons({
-                    style: style,
-                    createOrder: createOrder,
-                    onApprove: onApprove,
-                    onCancel: onCancel,
-                    onError: onError
-                })
-                .render(`#${btnId}`) // or class?
+            const paymentButton = window.onecheckout.Buttons({ style: style, createOrder: createOrder, onApprove: onApprove, onCancel: onCancel, onError: onError })
+            console.log('Payment button created', paymentButton);
+            paymentButton.render(`#${btnId}`) // or class?
+        }
 
-            clearInterval(interval)
-        }, 300)
+        script.onload = () => {
+            console.log('PayPal script loaded successfully');
+            paymentBtnf()
+            setIsIniting(false)
+        };
+
+        script.onerror = () => {
+            console.error('Error loading PayPal script');
+            // TODO handle error
+        };
+        script.onabort = () => {
+            console.error('Script loading was aborted!');
+            // TODO handle abort
+        };
     }
 
     useEffect(() => {
