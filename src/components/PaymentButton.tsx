@@ -19,6 +19,8 @@ declare global {
     }
 }
 
+let currentOrderId : string | null = null;
+
 const PaymentButton = ({
 }: {
     }) => {
@@ -51,6 +53,8 @@ const PaymentButton = ({
             const data = await response.json();
             console.log('Internal API Response:', data);
             paymentToken = data?.order?.payment_token || false;
+            // Store order ID for later use in onApprove
+            currentOrderId = data?.order?.id || null;
             console.log('Payment token:', paymentToken);
         } catch (error) {
             console.error('Error calling internal API:', error);
@@ -62,10 +66,42 @@ const PaymentButton = ({
     }
 
     async function onApprove() {
+        console.log('Payment approved demore-store', currentOrderId);
+
+        setIsLoading(true);
         try {
-            // TODO capture order
+            if (!currentOrderId) {
+                throw new Error('Order ID not found');
+            }
+
+            // Call internal API to update order status to success
+            const response = await fetch(`/api/orders/${currentOrderId}/success`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
+            }
+
+            const data = await response.json();
+            console.log('Success API Response:', data);
+
+            // Check if order status is success
+            if (data?.status === 'success') {
+                // Redirect to thank you page with order ID
+                window.location.href = `/thankyou?orderId=${currentOrderId}`;
+            } else {
+                throw new Error('Order status is not success');
+            }
         } catch (error) {
             console.error("Error on approve:", error);
+            // TODO: Show error message to user
+            alert('Payment was successful but there was an error updating the order. Please contact support.');
         } finally {
             setIsLoading(false);
         }

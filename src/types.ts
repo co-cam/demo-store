@@ -43,4 +43,8 @@ export type Order = {
     payment_token?: string,
     payment_id?: string,
     lastest_error?: string,
+
+    // metadata
+    createdAt?: string,
+    updatedAt?: string,
 }

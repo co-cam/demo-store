@@ -2,9 +2,7 @@ import { Order, ProductVariant } from "@/types";
 
 import { NextResponse } from 'next/server';
 import { Payment_api_url, Payment_api_key } from "@/const";
-
-// In-memory order storage
-let orders: Order[] = [];
+import { createOrder, updateOrder, getOrders } from "@/db";
 
 const ProductVariant1: ProductVariant = {
     sku: "sku-001",
@@ -36,10 +34,7 @@ const ProductVariant2: ProductVariant = {
 export async function POST(request: Request) {
     try {
         const data = await request.json();
-        // Generate a simple id (timestamp + random)
-        const id = Date.now().toString() + Math.floor(Math.random() * 1000).toString();
-        const order: Order = { ...data, id };
-        orders.push(order);
+        const order: Order = { ...data };
 
         // Validate order.order_lines with ProductVariant1 and ProductVariant2
         const validSkus = [ProductVariant1.sku, ProductVariant2.sku];
@@ -97,6 +92,10 @@ export async function POST(request: Request) {
 
         order.amount = order.subtotal + (order.shipping_fee || 0) + (order.tax_price || 0) + (order.tip_price || 0);
 
+        const id = `ord-${Date.now()}`;
+        order.id = id;
+        createOrder(order);
+
         const requestBody = {
             amount: order.amount,
             subtotal: order.subtotal,
@@ -149,6 +148,8 @@ export async function POST(request: Request) {
             order.lastest_error = error instanceof Error ? error.message : 'Unknown error';
         }
 
+        updateOrder(id, order)
+
         return NextResponse.json({ success: true, order });
     } catch (error) {
         return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
@@ -157,5 +158,8 @@ export async function POST(request: Request) {
 
 // ListOrders API (GET)
 export async function GET() {
+
+    let orders = getOrders();
+
     return NextResponse.json({ success: true, orders });
 }
