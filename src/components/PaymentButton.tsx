@@ -9,6 +9,7 @@ interface PaymentButtonOptions {
     onApprove?: (...args: unknown[]) => unknown;
     onCancel?: (...args: unknown[]) => unknown;
     onError?: (...args: unknown[]) => unknown;
+    gatewayId?: string;
 }
 
 declare global {
@@ -41,7 +42,7 @@ const PaymentButton = ({
 
     async function createOrder() {
         if (disabled) return false;
-        
+
         setIsLoading(true);
         let paymentToken: string | boolean = false;
         try {
