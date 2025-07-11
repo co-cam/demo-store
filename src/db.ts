@@ -10,7 +10,6 @@ let productVariants: ProductVariant[] = [
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
         compared_price: 3.999,
-        discount_value: 1.000,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -29,7 +28,6 @@ let productVariants: ProductVariant[] = [
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
         compared_price: 3.999,
-        discount_value: 1.000,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -48,7 +46,6 @@ let productVariants: ProductVariant[] = [
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
         compared_price: 3.999,
-        discount_value: 1.000,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -67,7 +64,6 @@ let productVariants: ProductVariant[] = [
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500&h=500&fit=crop",
         compared_price: 3.999,
-        discount_value: 1.000,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -86,7 +82,6 @@ let productVariants: ProductVariant[] = [
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500&h=500&fit=crop",
         compared_price: 3.999,
-        discount_value: 1.000,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -105,7 +100,6 @@ let productVariants: ProductVariant[] = [
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500&h=500&fit=crop",
         compared_price: 3.999,
-        discount_value: 1.000,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },

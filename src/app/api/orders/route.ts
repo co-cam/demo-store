@@ -29,16 +29,15 @@ export async function POST(request: Request) {
             const variant = productVariants.find(v => v.sku === line.sku);
             if (variant) {
                 // Copy all properties from variant except quantity
-                const { sku, default_price, product_title, image_url, compared_price, properties, discount_value } = variant;
+                const { sku, default_price, product_title, image_url, compared_price, properties } = variant;
                 return {
-                    ...line, // keep quantity and discount_value from line
+                    ...line, // keep quantity from line
                     sku,
                     default_price,
                     title: product_title,
                     image_url,
                     compared_price,
-                    properties,
-                    discount_value: discount_value ?? 0 // ensure number, not undefined
+                    properties
                 };
             }
             // If not found, return line as is
@@ -51,9 +50,7 @@ export async function POST(request: Request) {
             const variant = productVariants.find(v => v.sku === line.sku);
             const price = variant ? variant.default_price : (line.default_price || 0);
             
-            // Apply discount if present
-            const discount = line.discount_value || 0;
-            return sum + (price - discount) * (line.quantity || 1);
+            return sum + price * (line.quantity || 1);
         }, 0);
 
         order.amount = order.subtotal + (order.shipping_fee || 0) + (order.tax_price || 0) + (order.tip_price || 0);
@@ -74,7 +71,6 @@ export async function POST(request: Request) {
                 product_title: line.title,
                 image_url: line.image_url,
                 compared_price: line.compared_price,
-                discount_value: line.discount_value,
                 properties: line.properties || []
             }))
         };

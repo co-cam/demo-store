@@ -182,12 +182,6 @@ export default function ThankYouPage() {
                                     <span className="text-gray-900">${order.tip_price.toFixed(2)}</span>
                                 </div>
                             )}
-                            {order.discount_value && (
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Discount</span>
-                                    <span className="text-green-600">-${order.discount_value.toFixed(2)}</span>
-                                </div>
-                            )}
                             <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                                 <span>Total</span>
                                 <span>${(order.amount || 0).toFixed(2)}</span>

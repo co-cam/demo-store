@@ -47,11 +47,6 @@ export default function ProductCard({ product }: ProductCardProps) {
         }).format(price);
     };
 
-    const discountedPrice = selectedVariant.default_price - (selectedVariant.discount_value || 0);
-    const discountPercentage = selectedVariant.discount_value 
-        ? Math.round((selectedVariant.discount_value / selectedVariant.default_price) * 100) 
-        : 0;
-
     return (
         <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -102,17 +97,12 @@ export default function ProductCard({ product }: ProductCardProps) {
                         {/* Pricing */}
                         <div className="flex items-center gap-3 mb-4">
                             <span className="text-2xl font-bold text-gray-900">
-                                {formatPrice(discountedPrice)}
+                                {formatPrice(selectedVariant.default_price)}
                             </span>
-                            {selectedVariant.discount_value && (
-                                <>
-                                    <span className="text-lg text-gray-500 line-through">
-                                        {formatPrice(selectedVariant.default_price)}
-                                    </span>
-                                    <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
-                                        -{discountPercentage}%
-                                    </span>
-                                </>
+                            {selectedVariant.compared_price > selectedVariant.default_price && (
+                                <span className="text-lg text-gray-500 line-through">
+                                    {formatPrice(selectedVariant.compared_price)}
+                                </span>
                             )}
                         </div>
 
@@ -210,7 +200,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                                 orderLines={[{
                                     sku: selectedVariant.sku,
                                     quantity: quantity,
-                                    default_price: discountedPrice
+                                    default_price: selectedVariant.default_price
                                 }]}
                                 disabled={!selectedVariant.available || selectedVariant.inventory_quantity === 0}
                             />

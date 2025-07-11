@@ -5,7 +5,6 @@ export type OrderLine = {
     title: string,
     image_url: string,
     compared_price: number,
-    discount_value: number,
     properties: KV[],
 }
 
@@ -16,7 +15,6 @@ export type ProductVariant = {
     image_url: string,
     compared_price: number,
     properties: KV[],
-    discount_value?: number, // optional, if not present then no discount
     inventory_quantity: number,
     available: boolean,
     option1?: string, // e.g. "Size", "Color"
@@ -60,7 +58,6 @@ export type Order = {
     amount?: number, // total
     discount_code?: string,
     discount_percent?: number,
-    discount_value?: number,
     shipping_name?: string,
     shipping_fee?: number,
     tax_price?: number,
