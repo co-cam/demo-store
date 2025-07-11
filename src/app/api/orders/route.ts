@@ -1,9 +1,7 @@
 import { Order, ProductVariant } from "@/types";
 
 import { NextResponse } from 'next/server';
-
-const Payment_api_url = 'https://onecheckout.sandbox.whatee.io/api/v1.0/orders';
-const Payment_api_key = 'fbQzJdU7ZHK0TYLOWr9yp9kmOktXSTrKonu4C2D3tqMczMaRjJHfK1ebguupHbZNiMXi9vXZndRRNa6ak4rmEgdejcTseZYz2ycou63VmDTkYbHAa8x2sVFPofSFVwv7';
+import { Payment_api_url, Payment_api_key } from "@/const";
 
 // In-memory order storage
 let orders: Order[] = [];

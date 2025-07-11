@@ -1,10 +1,7 @@
 'use client';
 
 import { useEffect, useState, useId } from "react";
-
-// TODO replace with actual merchant ID
-const Payment_js_src = 'https://checkout.sandbox.whatee.store/sdk.js'
-const Payment_merchant_id = "8f1615ea-5181-4079-923a-c428450099eb";
+import { Payment_js_src, Payment_merchant_id } from '../const';
 
 interface PaymentButtonOptions {
     style?: Record<string, unknown>;
@@ -53,9 +50,8 @@ const PaymentButton = ({
             }
             const data = await response.json();
             console.log('Internal API Response:', data);
-            if (data && data.payment_token) {
-                paymentToken = data.payment_token;
-            }
+            paymentToken = data?.order?.payment_token || false;
+            console.log('Payment token:', paymentToken);
         } catch (error) {
             console.error('Error calling internal API:', error);
         } finally {
