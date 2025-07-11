@@ -21,18 +21,35 @@ declare global {
 
 let currentOrderId : string | null = null;
 
+interface OrderLineInput {
+    sku: string;
+    quantity: number;
+    default_price: number;
+}
+
 const PaymentButton = ({
+    orderLines,
+    disabled = false
 }: {
-    }) => {
+    orderLines?: OrderLineInput[];
+    disabled?: boolean;
+}) => {
     const btnId = useId();
 
     const [isIniting, setIsIniting] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
     async function createOrder() {
+        if (disabled) return false;
+        
         setIsLoading(true);
         let paymentToken: string | boolean = false;
         try {
+            // Use provided orderLines or default ones
+            const orderData = orderLines || [
+                { quantity: 1, sku: 'premium-tshirt-black-s', default_price: 1999 },
+            ];
+
             // Gọi API nội bộ Next.js (route handler)
             const response = await fetch('/api/orders', {
                 method: 'POST',
@@ -40,10 +57,7 @@ const PaymentButton = ({
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    order_lines: [
-                        { quantity: 1, sku: 'sku-001', default_price: 3 },
-                        { quantity: 1, sku: 'sku-002', default_price: 2 },
-                    ],
+                    order_lines: orderData,
                 }),
             });
             if (!response.ok) {
@@ -189,16 +203,24 @@ const PaymentButton = ({
                     <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-blue-500"></div>
                 </div>
             )}
-            {isIniting && (
+            {disabled && (
                 <button
-                    className="w-full bg-yellow-500 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center cursor-not-allowed opacity-75"
+                    className="w-full bg-gray-400 text-white font-medium py-3 px-6 rounded-lg cursor-not-allowed opacity-75"
+                    disabled
+                >
+                    Out of Stock
+                </button>
+            )}
+            {isIniting && !disabled && (
+                <button
+                    className="w-full bg-yellow-500 text-white font-medium py-3 px-6 rounded-lg flex items-center justify-center cursor-not-allowed opacity-75"
                     disabled
                 >
                     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white mr-2"></div>
-                    Loading...
+                    Loading Payment...
                 </button>
             )}
-            <div id={btnId}></div>
+            {!disabled && <div id={btnId}></div>}
         </div>
     );
 };

@@ -1,34 +1,8 @@
-import { Order, ProductVariant } from "@/types";
+import { Order } from "@/types";
 
 import { NextResponse } from 'next/server';
 import { Payment_api_url, Payment_api_key } from "@/const";
-import { createOrder, updateOrder, getOrders } from "@/db";
-
-const ProductVariant1: ProductVariant = {
-    sku: "sku-001",
-    default_price: 3,
-    product_title: "Sample Product",
-    image_url: "/sample-product.jpg",
-    compared_price: 6,
-    discount_value: 0,
-    properties: [
-        { key: "color", value: "blue" },
-        { key: "size", value: "xl" }
-    ]
-};
-
-const ProductVariant2: ProductVariant = {
-    sku: "sku-002",
-    default_price: 2,
-    product_title: "Sample Product",
-    image_url: "/sample-product.jpg",
-    compared_price: 6,
-    discount_value: 0,
-    properties: [
-        { key: "color", value: "blue" },
-        { key: "size", value: "xl" }
-    ]
-};
+import { createOrder, updateOrder, getOrders, getProductVariants } from "@/db";
 
 // CreateOrder API (POST)
 export async function POST(request: Request) {
@@ -36,8 +10,11 @@ export async function POST(request: Request) {
         const data = await request.json();
         const order: Order = { ...data };
 
-        // Validate order.order_lines with ProductVariant1 and ProductVariant2
-        const validSkus = [ProductVariant1.sku, ProductVariant2.sku];
+        // Get product variants from database
+        const productVariants = getProductVariants();
+
+        // Validate order.order_lines with product variants
+        const validSkus = productVariants.map(variant => variant.sku);
         if (!order.order_lines || !Array.isArray(order.order_lines) || order.order_lines.length === 0) {
             return NextResponse.json({ success: false, error: 'No order lines provided' }, { status: 400 });
         }
@@ -47,14 +24,9 @@ export async function POST(request: Request) {
             }
         }
 
-        // Overwrite order_lines with ProductVariant1 and ProductVariant2, exclude quantity
+        // Overwrite order_lines with product variants data, exclude quantity
         order.order_lines = order.order_lines.map(line => {
-            let variant = null;
-            if (line.sku === ProductVariant1.sku) {
-                variant = ProductVariant1;
-            } else if (line.sku === ProductVariant2.sku) {
-                variant = ProductVariant2;
-            }
+            const variant = productVariants.find(v => v.sku === line.sku);
             if (variant) {
                 // Copy all properties from variant except quantity
                 const { sku, default_price, product_title, image_url, compared_price, properties, discount_value } = variant;
@@ -73,18 +45,12 @@ export async function POST(request: Request) {
             return line;
         });
 
-
         // Calculate subtotal
         order.subtotal = (order.order_lines ?? []).reduce((sum, line) => {
-            // Use default_price from the product variant
-            let price = 0;
-            if (line.sku === ProductVariant1.sku) {
-                price = ProductVariant1.default_price;
-            } else if (line.sku === ProductVariant2.sku) {
-                price = ProductVariant2.default_price;
-            } else {
-                price = line.default_price || 0;
-            }
+            // Find the variant for this line
+            const variant = productVariants.find(v => v.sku === line.sku);
+            const price = variant ? variant.default_price : (line.default_price || 0);
+            
             // Apply discount if present
             const discount = line.discount_value || 0;
             return sum + (price - discount) * (line.quantity || 1);

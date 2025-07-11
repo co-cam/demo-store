@@ -162,7 +162,7 @@ export default function ThankYouPage() {
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Subtotal</span>
-                                <span className="text-gray-900">${order.subtotal.toFixed(2)}</span>
+                                <span className="text-gray-900">${(order.subtotal || 0).toFixed(2)}</span>
                             </div>
                             {order.shipping_fee && (
                                 <div className="flex justify-between text-sm">
@@ -190,7 +190,7 @@ export default function ThankYouPage() {
                             )}
                             <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                                 <span>Total</span>
-                                <span>${order.amount.toFixed(2)}</span>
+                                <span>${(order.amount || 0).toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
