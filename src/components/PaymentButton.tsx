@@ -89,8 +89,8 @@ const PaymentButton = ({
                 throw new Error('Order ID not found');
             }
 
-            // Call internal API to update order status to success
-            const response = await fetch(`/api/orders/${currentOrderId}/success`, {
+            // Call internal API to capture(update) order status to success
+            const response = await fetch(`/api/orders/${currentOrderId}/capture`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
