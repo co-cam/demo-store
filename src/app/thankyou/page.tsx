@@ -1,10 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Order } from '@/types';
 
 export default function ThankYouPage() {
+    return (
+        <Suspense fallback={<div className='min-h-screen flex items-center justify-center bg-gray-50'><div className='animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500'></div></div>}>
+            <ThankYouContent />
+        </Suspense>
+    );
+}
+
+function ThankYouContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const orderId = searchParams.get('orderId');
@@ -116,9 +125,11 @@ export default function ThankYouPage() {
                                     <div key={index} className="flex items-center space-x-4 p-4 border rounded-lg">
                                         <div className="flex-shrink-0">
                                             {line.image_url ? (
-                                                <img
+                                                <Image
                                                     src={line.image_url}
                                                     alt={line.title}
+                                                    width={64}
+                                                    height={64}
                                                     className="w-16 h-16 object-cover rounded"
                                                 />
                                             ) : (
@@ -192,7 +203,7 @@ export default function ThankYouPage() {
 
                 {/* Next Steps */}
                 <div className="bg-blue-50 rounded-lg p-6 mb-8">
-                    <h3 className="text-lg font-semibold text-blue-900 mb-2">What's Next?</h3>
+                    <h3 className="text-lg font-semibold text-blue-900 mb-2">What&apos;s Next?</h3>
                     <ul className="space-y-2 text-blue-800">
                         <li className="flex items-start">
                             <span className="text-blue-600 mr-2">•</span>
@@ -204,7 +215,7 @@ export default function ThankYouPage() {
                         </li>
                         <li className="flex items-start">
                             <span className="text-blue-600 mr-2">•</span>
-                            You'll receive tracking information once your order ships
+                            You&apos;ll receive tracking information once your order ships
                         </li>
                     </ul>
                 </div>

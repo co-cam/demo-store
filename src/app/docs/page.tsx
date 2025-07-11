@@ -563,7 +563,7 @@ export default function ThankYouPage() {
                   </p>
                   <p className="text-sm mt-2">
                     For complete API documentation and advanced features, visit the{' '}
-                    <a href="/" className="text-blue-600 hover:text-blue-800">Onecheckout Documentation</a>.
+                    <Link href="/" className="text-blue-600 hover:text-blue-800">Onecheckout Documentation</Link>.
                   </p>
                 </div>
               </footer>

@@ -195,7 +195,7 @@ const PaymentButton = ({
         if (typeof window !== "undefined") {
             initPayment();
         }
-    }, [merchantId]);
+    }, [merchantId, initPayment]);
 
     return (
         <div className="relative">

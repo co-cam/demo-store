@@ -20,9 +20,9 @@ export default function StripeHosted() {
     });
   };
 
-  const onApprove = async (data: any, actions: any) => {};
+  const onApprove = async () => {};
   const onCancel = () => {};
-  const onError = (err: unknown) => {};
+  const onError = () => {};
 
   const onSdkLoaded = () => {
     if (!window.onecheckout) {

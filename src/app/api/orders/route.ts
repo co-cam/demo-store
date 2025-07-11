@@ -49,7 +49,7 @@ export async function POST(request: Request) {
             // Find the variant for this line
             const variant = productVariants.find(v => v.sku === line.sku);
             const price = variant ? variant.default_price : (line.default_price || 0);
-            
+
             return sum + price * (line.quantity || 1);
         }, 0);
 
@@ -113,7 +113,7 @@ export async function POST(request: Request) {
         updateOrder(id, order)
 
         return NextResponse.json({ success: true, order });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
     }
 }
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
 // ListOrders API (GET)
 export async function GET() {
 
-    let orders = getOrders();
+    const orders = getOrders();
 
     return NextResponse.json({ success: true, orders });
 }

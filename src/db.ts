@@ -3,7 +3,7 @@ import { Order, ProductVariant, Product } from './types';
 
 // Giả lập cơ sở dữ liệu trong bộ nhớ
 let orders: Order[] = [];
-let productVariants: ProductVariant[] = [
+const productVariants: ProductVariant[] = [
     {
         sku: "premium-tshirt-black-s",
         default_price: 2.999,
@@ -114,7 +114,7 @@ let productVariants: ProductVariant[] = [
     }
 ];
 
-let products: Product[] = [
+const products: Product[] = [
     {
         id: "premium-tshirt-001",
         title: "Premium Cotton T-Shirt",

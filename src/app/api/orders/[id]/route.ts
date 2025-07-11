@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getOrderById, updateOrder } from '@/db';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     if (!id) {
         return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
@@ -31,7 +31,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     let data;
     try {
         data = await request.json();
-    } catch (e) {
+    } catch {
         return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
