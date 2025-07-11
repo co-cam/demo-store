@@ -5,13 +5,6 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -22,5 +15,66 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Custom styles for documentation page */
+.docs-page {
+  scroll-behavior: smooth;
+}
+
+.docs-page code {
+  background-color: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+}
+
+.docs-page pre {
+  background-color: #1f2937;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+}
+
+.docs-page pre code {
+  background-color: transparent;
+  padding: 0;
+  color: #f9fafb;
+}
+
+.docs-page h2 {
+  scroll-margin-top: 2rem;
+}
+
+.docs-page h3 {
+  scroll-margin-top: 2rem;
+}
+
+.docs-page a {
+  transition: color 0.2s ease;
+}
+
+.docs-page a:hover {
+  text-decoration: underline;
+}
+
+/* Scrollbar styling */
+.docs-page::-webkit-scrollbar {
+  width: 8px;
+}
+
+.docs-page::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.docs-page::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.docs-page::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

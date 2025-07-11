@@ -1,5 +1,6 @@
 import ProductCard from "@/components/ProductCard";
 import { getProducts } from "@/db";
+import Link from "next/link";
 
 export default function Home() {
   const products = getProducts();
@@ -15,6 +16,12 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-gray-900">Demo Store</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Link 
+                href="/docs" 
+                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+              >
+                📚 Integration Guide
+              </Link>
               <span className="text-sm text-gray-500">Premium Fashion</span>
             </div>
           </div>
@@ -79,7 +86,16 @@ export default function Home() {
       <footer className="bg-white border-t border-gray-200 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <p className="text-gray-600">© 2024 Demo Store. Built with Next.js and integrated payment processing.</p>
+            <p className="text-gray-600 mb-2">© 2024 Demo Store. Built with Next.js and integrated payment processing.</p>
+            <div className="flex justify-center space-x-4 text-sm">
+              <Link href="/docs" className="text-blue-600 hover:text-blue-800">
+                📚 Integration Guide
+              </Link>
+              <span className="text-gray-400">|</span>
+              <Link href="/thankyou" className="text-blue-600 hover:text-blue-800">
+                Thank You Page
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
