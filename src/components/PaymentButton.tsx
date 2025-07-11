@@ -2,6 +2,10 @@
 
 import { useEffect, useState, useId } from "react";
 
+// TODO replace with actual merchant ID
+const Payment_js_src = 'https://checkout.sandbox.whatee.store/sdk.js'
+const Payment_merchant_id = "8f1615ea-5181-4079-923a-c428450099eb";
+
 interface PaymentButtonOptions {
     style?: Record<string, unknown>;
     createOrder?: (...args: unknown[]) => unknown;
@@ -27,87 +31,37 @@ const PaymentButton = ({
     const [isLoading, setIsLoading] = useState(false);
 
     async function createOrder() {
-        // TODO handle by backend
-        // if (order.payment_id && order.status == "AWAITING_CAPTURE") {
-        //     return order.payment_id
-        // }
-
         setIsLoading(true);
-
-        let paymentToken: string | boolean = "0be52e68-5df9-4f06-8726-9ed9db259dd6"; // TODO replace
-
-        const apiUrl = 'http://localhost:9000/api/v1.0/orders';
-        const apiKey = '0ydVp7HyU3QY6iIAIVoPFajhdqRENG0RoatHaWGe4MnclqIqU4iu82aYpHfemph3lcR9Fru1ug24KbsUpOu7HWTYT5lInsaRK1JG0XookpjI5xwk2Jrmt4TVxRo67wx8';
-
-        const requestBody = {
-            "amount": 6,
-            "subtotal": 5,
-            "shipping_name": "FedEx",
-            "shipping_fee": 1,
-            "order_lines": [
-                {
-                    "quantity": 1,
-                    "sku": "abc",
-                    "default_price": 3,
-                    "product_title": "Sample Product",
-                    "image_url": "/sample-product.jpg",
-                    "compared_price": 6,
-                    "discount_value": 1,
-                    "properties": [
-                        { "key": "color", "value": "blue" },
-                        { "key": "size", "value": "xl" }
-                    ]
-                },
-                {
-                    "quantity": 1,
-                    "sku": "abc",
-                    "default_price": 2,
-                    "product_title": "Sample Product",
-                    "image_url": "/sample-product.jpg",
-                    "compared_price": 6,
-                    "discount_value": 1,
-                    "properties": [
-                        { "key": "color", "value": "blue" },
-                        { "key": "size", "value": "xl" }
-                    ]
-                }
-            ]
-        };
-
+        let paymentToken: string | boolean = false;
         try {
-            const response = await fetch(apiUrl, {
+            // Gọi API nội bộ Next.js (route handler)
+            const response = await fetch('/api/orders', {
                 method: 'POST',
                 headers: {
-                    'api-key': apiKey,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify({
+                    order_lines: [
+                        { quantity: 1, sku: 'sku-001', default_price: 3 },
+                        { quantity: 1, sku: 'sku-002', default_price: 2 },
+                    ],
+                }),
             });
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
             }
             const data = await response.json();
-            console.log('API Response:', data);
+            console.log('Internal API Response:', data);
             if (data && data.payment_token) {
-                // TODO handle payment_token
-                // if (data.payment_token && data.status == "AWAITING_CAPTURE") {
-                //     return data.payment_token;
-                //     paymentToken = data.payment_token;
-                // }
                 paymentToken = data.payment_token;
             }
         } catch (error) {
-            console.error('Error calling API:', error);
+            console.error('Error calling internal API:', error);
         } finally {
             setIsLoading(false);
         }
-
-        if (!paymentToken) {
-            setIsLoading(false);
-            return false;
-        }
-
+        console.log('Payment token:', paymentToken);
         return paymentToken;
     }
 
@@ -132,7 +86,7 @@ const PaymentButton = ({
         // TODO
     }
 
-    const merchantId = "8cb7d434-83a7-46f5-acf7-a38426585543"; // TODO replace
+    const merchantId = Payment_merchant_id;
 
     function initPayment() {
         if (typeof window === "undefined") {
@@ -147,14 +101,14 @@ const PaymentButton = ({
             return;
         }
 
-        const paymentSrc = `http://localhost:3000/sdk.js?merchant_id=${merchantId}`;
+        const paymentSrc = `${Payment_js_src}?merchant_id=${merchantId}`;
         const script = document.createElement('script')
         script.setAttribute('src', paymentSrc)
         document.head.appendChild(script)
 
         const paymentBtnf = function () {
             if (!window.onecheckout) {
-                console.error("PayPal SDK not loaded");
+                console.error("Onecheckout SDK not loaded");
                 // TODO handle
                 return
             }
@@ -175,13 +129,13 @@ const PaymentButton = ({
         }
 
         script.onload = () => {
-            console.log('PayPal script loaded successfully');
+            console.log('Onecheckout script loaded successfully');
             paymentBtnf()
             setIsIniting(false)
         };
 
         script.onerror = () => {
-            console.error('Error loading PayPal script');
+            console.error('Error loading Onecheckout script');
             // TODO handle error
         };
         script.onabort = () => {
