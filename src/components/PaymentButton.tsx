@@ -141,23 +141,23 @@ const PaymentButton = ({
             return
         }
 
-        if (window.onecheckout) {
-            console.log('Onecheckout script already loaded');
-            setIsIniting(false);
-            // make sure right merchant of loaded onecheckout script
-            return;
-        }
-
-        const paymentSrc = `${Payment_js_src}?merchant_id=${merchantId}`;
-        const script = document.createElement('script')
-        script.setAttribute('src', paymentSrc)
-        document.head.appendChild(script)
-
-        const paymentBtnf = function () {
+        const renderPaymentButton = () => {
             if (!window.onecheckout) {
                 console.error("Onecheckout SDK not loaded");
-                // TODO handle
                 return
+            }
+
+            // Kiểm tra xem button container có tồn tại và có nội dung chưa
+            const buttonContainer = document.getElementById(btnId);
+            if (!buttonContainer) {
+                console.error("Button container not found");
+                return;
+            }
+
+            // Nếu button đã được render (container có nội dung), không render lại
+            if (buttonContainer.innerHTML.trim() !== '') {
+                console.log('Payment button already rendered');
+                return;
             }
 
             const style = {
@@ -170,14 +170,33 @@ const PaymentButton = ({
                 fundingicons: 'false'
             }
 
-            const paymentButton = window.onecheckout.Buttons({ style: style, createOrder: createOrder, onApprove: onApprove, onCancel: onCancel, onError: onError })
+            const paymentButton = window.onecheckout.Buttons({
+                style: style,
+                createOrder: createOrder,
+                onApprove: onApprove,
+                onCancel: onCancel,
+                onError: onError
+            })
             console.log('Payment button created', paymentButton);
-            paymentButton.render(`#${btnId}`) // or class?
+            paymentButton.render(`#${btnId}`);
         }
+
+        if (window.onecheckout) {
+            console.log('Onecheckout script already loaded');
+            setIsIniting(false);
+            // Script đã tải, render button ngay lập tức
+            renderPaymentButton();
+            return;
+        }
+
+        const paymentSrc = `${Payment_js_src}?merchant_id=${merchantId}`;
+        const script = document.createElement('script')
+        script.setAttribute('src', paymentSrc)
+        document.head.appendChild(script)
 
         script.onload = () => {
             console.log('Onecheckout script loaded successfully');
-            paymentBtnf()
+            renderPaymentButton();
             setIsIniting(false)
         };
 
