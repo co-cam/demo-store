@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getOrderById, updateOrder } from '@/db';
+import { updateOrder, readOrder } from '@/db2';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
     if (!id) {
         return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
-    const order = getOrderById(id);
+    const order = await readOrder(id);
     if (!order) {
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
@@ -20,7 +20,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
-    const order = getOrderById(id);
+    const order = await readOrder(id);
     if (!order) {
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }

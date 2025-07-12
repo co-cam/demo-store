@@ -158,7 +158,7 @@ export const getOrders = (): Order[] => orders;
 
 export const getOrderById = (id: string): Order | undefined => orders.find(order => order.id === id);
 
-export const createOrder = (newOrder: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>): Order => {
+export const createOrder = (newOrder: Omit<Order, 'createdAt' | 'updatedAt'>): Order => {
     const createdAt = new Date().toISOString();
     const updatedAt = new Date().toISOString();
     const order: Order = { ...newOrder, createdAt, updatedAt, status: 'pending' };

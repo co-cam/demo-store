@@ -2,13 +2,14 @@ import { Order } from "@/types";
 
 import { NextResponse } from 'next/server';
 import { Payment_api_url, Payment_api_key } from "@/const";
-import { createOrder, updateOrder, getOrders, getProductVariants } from "@/db";
+import { getProductVariants } from "@/db";
+import { addOrder, updateOrder, getOrders } from "@/db2";
 
 // CreateOrder API (POST)
 export async function POST(request: Request) {
     try {
         const data: any = await request.json();
-        const order: Order = { ...data };
+        let order: Order = { ...data };
 
         // Get product variants from database
         const productVariants = getProductVariants();
@@ -55,9 +56,7 @@ export async function POST(request: Request) {
 
         order.amount = order.subtotal + (order.shipping_fee || 0) + (order.tax_price || 0) + (order.tip_price || 0);
 
-        const id = `ord-${Date.now()}`;
-        order.id = id;
-        createOrder(order);
+        order = await addOrder(order);
 
         const requestBody = {
             amount: order.amount,
@@ -110,7 +109,11 @@ export async function POST(request: Request) {
             order.lastest_error = error instanceof Error ? error.message : 'Unknown error';
         }
 
-        updateOrder(id, order)
+        if (order.id) {
+            await updateOrder(order.id, order)
+        } else {
+            return NextResponse.json({ success: false, error: 'Order ID is required' }, { status: 400 });
+        }
 
         return NextResponse.json({ success: true, order });
     } catch {
@@ -121,7 +124,7 @@ export async function POST(request: Request) {
 // ListOrders API (GET)
 export async function GET() {
 
-    const orders = getOrders();
+    const orders = await getOrders();
 
     return NextResponse.json({ success: true, orders });
 }

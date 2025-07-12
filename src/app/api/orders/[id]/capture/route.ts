@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getOrderById, updateOrder, getOrders } from '@/db';
 import { Payment_api_url, Payment_api_key } from "@/const";
+import { readOrder, updateOrder } from '@/db2';
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -10,11 +10,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     console.log('Updating order status to success for ID:', id);
 
-    // why? if comment out, it will not work
-    const orders = getOrders();
-    console.log('Current orders:', orders);
-
-    const order = getOrderById(id);
+    const order = await readOrder(id);
     if (!order) {
         return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
@@ -72,7 +68,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         patch.lastest_error = error instanceof Error ? error.message : 'Unknown error';
     }
 
-    const updated = updateOrder(id, patch);
+    const updated = await updateOrder(id, patch);
     if (!updated) {
         return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
     }
