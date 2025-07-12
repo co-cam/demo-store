@@ -105,6 +105,21 @@ export const Payment_api_key = 'your-api-key';`}</code>
                     <p className="text-gray-700 mb-4">
                       Create the order creation endpoint at <code className="bg-gray-100 px-2 py-1 rounded text-sm">src/app/api/orders/route.ts</code>:
                     </p>
+                    <blockquote className="bg-gray-100 border-l-4 border-blue-500 text-blue-700 p-4">
+                      <p><strong>Explanation:</strong></p>
+                      <p>This code defines a API route (<code>POST /api/orders</code>) for creating a new order and initializing a payment with the Onecheckout API. It:</p>
+                      <ul className="list-disc pl-6">
+                        <li>Receives order data from the client, validates the order lines, and calculates the subtotal and total amount.</li>
+                        <li>Generates a unique order ID and prepares a request to the Onecheckout payment API, including order details and line items.</li>
+                        <li>Handles the response from the payment API, saving the payment token and ID to the order if successful, or logging errors if not.</li>
+                        <li>Returns the order (with payment info if available) as a JSON response.</li>
+                      </ul>
+                      <p><strong>Key variables/functions:</strong></p>
+                      <ul className="list-disc pl-6">
+                        <li><code>order</code>: The order object being processed.</li>
+                        <li><code>requestBody</code>: The payload sent to the Onecheckout API.</li>
+                      </ul>
+                    </blockquote>
                     <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto max-h-96">
                       <pre className="text-sm text-gray-100">
                         <code>{`// src/app/api/orders/route.ts
@@ -192,6 +207,21 @@ export async function POST(request: Request) {
                     <p className="text-gray-700 mb-4">
                       Create the payment capture endpoint at <code className="bg-gray-100 px-2 py-1 rounded text-sm">src/app/api/orders/[id]/capture/route.ts</code>:
                     </p>
+                    <blockquote className="bg-gray-100 border-l-4 border-blue-500 text-blue-700 p-4">
+                      <p><strong>Explanation:</strong></p>
+                      <p>This code defines a API route (<code>POST /api/orders/[id]/capture</code>) for capturing a payment after an order has been created. It:</p>
+                      <ul className="list-disc pl-6">
+                        <li>Receives the order ID from the URL parameters and validates it.</li>
+                        <li>Retrieves the order from your database (requires implementing <code>getOrderById</code>).</li>
+                        <li>Calls the Onecheckout API to check the payment status for the order's payment ID.</li>
+                        <li>If the payment is marked as 'PAID', updates the order status to 'success' (requires implementing <code>updateOrder</code>).</li>
+                        <li>Returns the updated order as a JSON response, or handles errors appropriately.</li>
+                      </ul>
+                      <p><strong>Key variables/functions:</strong></p>
+                      <ul className="list-disc pl-6">
+                        <li><code>order</code>: The order object fetched from your database.</li>
+                      </ul>
+                    </blockquote>
                     <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto max-h-96">
                       <pre className="text-sm text-gray-100">
                         <code>{`// src/app/api/orders/[id]/capture/route.ts
@@ -270,6 +300,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                     <p className="text-gray-700 mb-4">
                       Create a reusable payment button component that handles the Onecheckout SDK:
                     </p>
+                    <blockquote className="bg-gray-100 border-l-4 border-blue-500 text-blue-700 p-4">
+                      <p><strong>Explanation:</strong></p>
+                      <p>This code defines a reusable React component (<code>PaymentButton</code>) for integrating the Onecheckout payment SDK in a Next.js app. It:</p>
+                      <ul className="list-disc pl-6">
+                        <li>Dynamically loads the Onecheckout SDK and renders a payment button.</li>
+                        <li>Handles order creation by calling the <code>/api/orders</code> endpoint and retrieves a payment token.</li>
+                        <li>Manages payment approval by capturing the payment via <code>/api/orders/[orderId]/capture</code> and redirects to a thank you page on success.</li>
+                        <li>Shows loading states and disables the button when needed.</li>
+                      </ul>
+                    </blockquote>
                     <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto max-h-96">
                       <pre className="text-sm text-gray-100">
                         <code>{`// src/components/PaymentButton.tsx
