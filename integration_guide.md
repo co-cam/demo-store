@@ -34,7 +34,7 @@ Create the order creation endpoint at `src/app/api/orders/route.ts`:
 
 > **Explanation:**
 >
-> This code defines a Next.js API route (`POST /api/orders`) for creating a new order and initializing a payment with the Onecheckout API. It:
+> This code defines a API route (`POST /api/orders`) for creating a new order and initializing a payment with the Onecheckout API. It:
 > - Receives order data from the client, validates the order lines, and calculates the subtotal and total amount.
 > - Generates a unique order ID and prepares a request to the Onecheckout payment API, including order details and line items.
 > - Handles the response from the payment API, saving the payment token and ID to the order if successful, or logging errors if not.
@@ -43,8 +43,6 @@ Create the order creation endpoint at `src/app/api/orders/route.ts`:
 > **Key variables/functions:**
 > - `order`: The order object being processed.
 > - `requestBody`: The payload sent to the Onecheckout API.
-> - `POST`: The main handler function for the route.
-> - Error handling ensures robust API responses and logging.
 ```typescript
 // src/app/api/orders/route.ts
 import { NextResponse } from 'next/server';
@@ -126,7 +124,22 @@ export async function POST(request: Request) {
 
 ### 2. Capture Payment API
 
+
 Create the payment capture endpoint at `src/app/api/orders/[id]/capture/route.ts`:
+
+> **Explanation:**
+>
+> This code defines a API route (`POST /api/orders/[id]/capture`) for capturing a payment after an order has been created. It:
+> - Receives the order ID from the URL parameters and validates it.
+> - Retrieves the order from your database (requires implementing `getOrderById`).
+> - Calls the Onecheckout API to check the payment status for the order's payment ID.
+> - If the payment is marked as 'PAID', updates the order status to 'success' (requires implementing `updateOrder`).
+> - Returns the updated order as a JSON response, or handles errors appropriately.
+>
+> **Key variables/functions:**
+> - `order`: The order object fetched from your database.
+> - `getOrderById`: Function to retrieve the order (to be implemented).
+> - `updateOrder`: Function to update the order (to be implemented).
 
 ```typescript
 // src/app/api/orders/[id]/capture/route.ts
@@ -197,6 +210,21 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
 Create a reusable payment button component that handles the Onecheckout SDK:
 
+> **Explanation:**
+>
+> This code defines a reusable React component (`PaymentButton`) for integrating the Onecheckout payment SDK in a Next.js app. It:
+> - Dynamically loads the Onecheckout SDK and renders a payment button.
+> - Handles order creation by calling the `/api/orders` endpoint and retrieves a payment token.
+> - Manages payment approval by capturing the payment via `/api/orders/[orderId]/capture` and redirects to a thank you page on success.
+> - Shows loading states and disables the button when needed.
+>
+> **Key variables/functions:**
+> - `createOrder`: Creates an order and returns a payment token.
+> - `onApprove`: Captures payment and handles post-payment actions.
+> - `initPayment`: Loads the SDK and initializes the payment button.
+> - `btnId`: Unique ID for the payment button container.
+>
+> Error handling and UI feedback are included for a smooth user experience.
 ```typescript
 // src/components/PaymentButton.tsx
 'use client';
