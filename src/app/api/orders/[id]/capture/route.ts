@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getOrderById, updateOrder } from '@/db';
+import { getOrderById, updateOrder, getOrders } from '@/db';
 import { Payment_api_url, Payment_api_key } from "@/const";
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -11,8 +11,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     console.log('Updating order status to success for ID:', id);
 
     // why? if comment out, it will not work
-    // const orders = getOrders();
-    // console.log('Current orders:', orders);
+    const orders = getOrders();
+    console.log('Current orders:', orders);
 
     const order = getOrderById(id);
     if (!order) {
