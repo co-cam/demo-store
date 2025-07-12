@@ -32,6 +32,18 @@ export const Payment_api_key = 'your-api-key';
 
 Create the order creation endpoint at `src/app/api/orders/route.ts`:
 
+// ---
+// **Explanation:**
+// This code defines a Next.js API route (`POST /api/orders`) for creating a new order and initializing a payment with the Onecheckout API. It:
+// - Receives order data from the client, validates the order lines, and calculates the subtotal and total amount.
+// - Generates a unique order ID and prepares a request to the Onecheckout payment API, including order details and line items.
+// - Handles the response from the payment API, saving the payment token and ID to the order if successful, or logging errors if not.
+// - Returns the order (with payment info if available) as a JSON response. Key variables/functions:
+//   - `order`: The order object being processed.
+//   - `requestBody`: The payload sent to the Onecheckout API.
+//   - `POST`: The main handler function for the route.
+//   - Error handling ensures robust API responses and logging.
+// ---
 ```typescript
 // src/app/api/orders/route.ts
 import { NextResponse } from 'next/server';
