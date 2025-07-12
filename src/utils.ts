@@ -19,7 +19,7 @@ export async function doCreateOrder({ apiKey }: { apiKey?: string | null }): Pro
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData: any = await response.json();
       throw new Error(
         `HTTP error! Status: ${response.status}, Message: ${
           errorData.message || "Unknown error"
@@ -27,7 +27,7 @@ export async function doCreateOrder({ apiKey }: { apiKey?: string | null }): Pro
       );
     }
 
-    const data = await response.json();
+    const data: any = await response.json();
 
     console.log("API Response:", data);
 

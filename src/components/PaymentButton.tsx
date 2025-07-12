@@ -62,10 +62,10 @@ const PaymentButton = ({
                 }),
             });
             if (!response.ok) {
-                const errorData = await response.json();
+                const errorData: any = await response.json();
                 throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
             }
-            const data = await response.json();
+            const data: any = await response.json();
             console.log('Internal API Response:', data);
             paymentToken = data?.order?.payment_token || false;
             // Store order ID for later use in onApprove
@@ -99,11 +99,11 @@ const PaymentButton = ({
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
+                const errorData: any = await response.json();
                 throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
             }
 
-            const data = await response.json();
+            const data: any = await response.json();
             console.log('Success API Response:', data);
 
             // Check if order status is success

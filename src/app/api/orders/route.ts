@@ -7,7 +7,7 @@ import { createOrder, updateOrder, getOrders, getProductVariants } from "@/db";
 // CreateOrder API (POST)
 export async function POST(request: Request) {
     try {
-        const data = await request.json();
+        const data: any = await request.json();
         const order: Order = { ...data };
 
         // Get product variants from database
@@ -91,7 +91,7 @@ export async function POST(request: Request) {
                     headersObj[key] = value;
                 });
 
-                const errorData = await response.json();
+                const errorData: any = await response.json();
 
                 console.error('API Error - Status:', response.status);
                 console.error('API Error - Headers:', headersObj);
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
 
                 throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
             }
-            const data = await response.json();
+            const data: any = await response.json();
             console.log('API Response:', data);
             if (data && data.payment_token) {
                 order.payment_token = data.payment_token;

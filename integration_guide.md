@@ -53,7 +53,7 @@ import { Order } from "@/types";
 
 export async function POST(request: Request) {
     try {
-        const data = await request.json();
+        const data: any = await request.json();
         const order: Order = { ...data };
 
         // Validate order lines
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
+                const errorData: any = await response.json();
                 throw new Error(`Payment API error: ${response.status} - ${errorData.message}`);
             }
 
@@ -166,7 +166,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData: any = await response.json();
             throw new Error(`Payment API error: ${response.status} - ${errorData.message}`);
         }
 
@@ -243,7 +243,7 @@ const PaymentButton = ({
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
-            const data = await response.json();
+            const data: any = await response.json();
             currentOrderId = data?.order?.id || null;
             return data?.order?.payment_token || false;
         } catch (error) {
@@ -270,7 +270,7 @@ const PaymentButton = ({
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
-            const data = await response.json();
+            const data: any = await response.json();
             
             if (data?.status === 'success') {
                 window.location.href = `/thankyou?orderId=${currentOrderId}`;

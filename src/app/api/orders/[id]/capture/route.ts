@@ -50,7 +50,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                 headersObj[key] = value;
             });
 
-            const errorData = await response.json();
+            const errorData: any = await response.json();
 
             console.error('API Error - Status:', response.status);
             console.error('API Error - Headers:', headersObj);
@@ -58,7 +58,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
             throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
         }
-        const data = await response.json();
+        const data: any = await response.json();
         console.log('API Response:', data);
         if (data && data.payment_token) {
             patch.payment_token = data.payment_token;

@@ -34,7 +34,7 @@ function ThankYouContent() {
                 if (!response.ok) {
                     throw new Error('Failed to fetch order');
                 }
-                const data = await response.json();
+                const data: any = await response.json();
                 setOrder(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Unknown error');
