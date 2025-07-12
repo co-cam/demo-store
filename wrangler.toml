@@ -1,0 +1,5 @@
+name = "demo-store"
+compatibility_date = "2025-07-12"
+
+[pages]
+build_output_dir = ".next"
