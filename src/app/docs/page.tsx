@@ -605,6 +605,10 @@ export default function ThankYouPage() {
                     For complete API documentation and advanced features, visit the{' '}
                     <Link href="/" className="text-blue-600 hover:text-blue-800">Onecheckout Documentation</Link>.
                   </p>
+                  <p className="text-sm mt-2">
+                    View the full example integration source code at{' '}
+                    <a href="https://github.com/co-cam/demo-store" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline">https://github.com/co-cam/demo-store</a>.
+                  </p>
                 </div>
               </footer>
             </div>
