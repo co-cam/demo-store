@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM imbios/bun-node:1.2.18-23.11.0-alpine AS build
+FROM --platform=$BUILDPLATFORM oven/bun:1.2.18-alpine AS build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS=--max-old-space-size=2048
 WORKDIR /app
@@ -17,7 +17,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 COPY package.json ./
 RUN bun install --production --ignore-scripts --prefer-offline
-COPY --from=build /app/next.config.mjs ./
+COPY --from=build /app/next.config.ts ./
 COPY --from=build /app/public ./public
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/start.sh ./
