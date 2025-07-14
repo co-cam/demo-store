@@ -8,6 +8,7 @@ const ordersCollectionRef = collection(db, 'orders');
 
 // Thêm đơn hàng mới
 export const addOrder = async (orderData: Order): Promise<Order> => {
+    console.log('Adding order:', orderData);
     try {
         const docRef = await addDoc(ordersCollectionRef, {
             ...orderData,
@@ -26,10 +27,12 @@ export const addOrder = async (orderData: Order): Promise<Order> => {
 
 // Lấy tất cả đơn hàng
 export const getOrders = async (): Promise<Order[]> => {
+    console.log('Fetching all orders');
     try {
         const q = query(ordersCollectionRef, orderBy('orderDate', 'desc')); // Sắp xếp theo ngày tạo mới nhất
         const data = await getDocs(q);
         const orders: Order[] = data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Order));
+        console.log('Orders fetched:', orders.length);
         return orders;
     } catch (e) {
         console.error("Error getting documents: ", e);
@@ -39,6 +42,7 @@ export const getOrders = async (): Promise<Order[]> => {
 
 // Cập nhật đơn hàng
 export const updateOrder = async (id: string, updatedData: Partial<Order>): Promise<Order> => {
+    console.log('Updating order ID:', id);
     try {
         const orderDoc = doc(db, 'orders', id);
         const docSnap = await getDocs(query(collection(db, 'orders')));
@@ -61,11 +65,13 @@ export const updateOrder = async (id: string, updatedData: Partial<Order>): Prom
 // Xóa đơn hàng
 // Lấy đơn hàng theo id
 export const readOrder = async (id: string): Promise<Order> => {
+    console.log('Reading order ID:', id);
     try {
         const orderDoc = doc(db, 'orders', id);
         const docSnap = await getDocs(query(collection(db, 'orders')));
         const found = docSnap.docs.find((d) => d.id === id);
         if (found) {
+            console.log("Document found:", found.id);
             return { id: found.id, ...found.data() } as Order;
         } else {
             throw new Error('Order not found');
