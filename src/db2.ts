@@ -45,11 +45,17 @@ export const updateOrder = async (id: string, updatedData: Partial<Order>): Prom
     try {
         const orderDoc = doc(db, 'orders', id);
         const docSnap = await getDoc(orderDoc);
+
         if (!docSnap.exists()) {
             throw new Error('Order not found');
         }
 
-        const updatedOrder = { ...docSnap.data(), ...updatedData, updatedAt: new Date().toISOString(), id: id };
+        const data = docSnap.data();
+        if (!data) {
+            throw new Error('Document exists but data is undefined');
+        }
+
+        const updatedOrder = { ...data, ...updatedData, updatedAt: new Date().toISOString(), id: id };
         await updateDoc(orderDoc, updatedOrder);
         console.log("Document updated successfully!");
         return updatedOrder as Order;
@@ -66,12 +72,19 @@ export const readOrder = async (id: string): Promise<Order> => {
     try {
         const orderDoc = doc(db, 'orders', id);
         const docSnap = await getDoc(orderDoc);
-        if (docSnap.exists()) {
-            console.log("Document found:", docSnap.id);
-            return { id: docSnap.id, ...docSnap.data() } as Order;
-        } else {
+
+        if (!docSnap.exists()) {
             throw new Error('Order not found');
         }
+
+        const data = docSnap.data();
+        if (!data) {
+            throw new Error('Document exists but data is undefined');
+        }
+
+        console.log("Document found:", docSnap.id);
+        return { id: docSnap.id, ...data } as Order;
+
     } catch (e) {
         console.error('Error reading document: ', e);
         throw e;
@@ -82,10 +95,16 @@ export const deleteOrder = async (id: string): Promise<Order> => {
     try {
         const orderDoc = doc(db, 'orders', id);
         const docSnap = await getDoc(orderDoc);
+
         if (!docSnap.exists()) {
             throw new Error('Order not found');
         }
-        const deletedOrder = { id: docSnap.id, ...docSnap.data() } as Order;
+
+        const data = docSnap.data();
+        if (!data) {
+            throw new Error('Document exists but data is undefined');
+        }
+        const deletedOrder = { id: docSnap.id, ...data } as Order;
         await deleteDoc(orderDoc);
         console.log("Document deleted successfully!");
         return deletedOrder;
