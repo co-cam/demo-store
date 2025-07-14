@@ -71,13 +71,15 @@ export const readOrder = async (id: string): Promise<Order> => {
     console.log('Reading order ID:', id);
     try {
         const orderDoc = doc(db, 'orders', id);
+        console.log("reading order document with ID:", id, 1);
         const docSnap = await getDoc(orderDoc);
-
+        console.log("reading order document with ID:", id, 2);
         if (!docSnap.exists()) {
             throw new Error('Order not found');
         }
-
+        console.log("reading order document with ID:", id, 3);
         const data = docSnap.data();
+        console.log("reading order document with ID:", id, 4);
         if (!data) {
             throw new Error('Document exists but data is undefined');
         }
