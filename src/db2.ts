@@ -1,8 +1,7 @@
 // services/orderService.js
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { Order } from './types';
-import { create } from 'domain';
 
 const ordersCollectionRef = collection(db, 'orders');
 
@@ -45,14 +44,12 @@ export const updateOrder = async (id: string, updatedData: Partial<Order>): Prom
     console.log('Updating order ID:', id);
     try {
         const orderDoc = doc(db, 'orders', id);
-        const docSnap = await getDocs(query(collection(db, 'orders')));
-        const found = docSnap.docs.find((d) => d.id === id);
-
-        if (!found) {
+        const docSnap = await getDoc(orderDoc);
+        if (!docSnap.exists()) {
             throw new Error('Order not found');
         }
 
-        const updatedOrder = { ...found.data(), ...updatedData, updatedAt: new Date().toISOString(), id: id };
+        const updatedOrder = { ...docSnap.data(), ...updatedData, updatedAt: new Date().toISOString(), id: id };
         await updateDoc(orderDoc, updatedOrder);
         console.log("Document updated successfully!");
         return updatedOrder as Order;
@@ -68,11 +65,10 @@ export const readOrder = async (id: string): Promise<Order> => {
     console.log('Reading order ID:', id);
     try {
         const orderDoc = doc(db, 'orders', id);
-        const docSnap = await getDocs(query(collection(db, 'orders')));
-        const found = docSnap.docs.find((d) => d.id === id);
-        if (found) {
-            console.log("Document found:", found.id);
-            return { id: found.id, ...found.data() } as Order;
+        const docSnap = await getDoc(orderDoc);
+        if (docSnap.exists()) {
+            console.log("Document found:", docSnap.id);
+            return { id: docSnap.id, ...docSnap.data() } as Order;
         } else {
             throw new Error('Order not found');
         }
@@ -85,13 +81,11 @@ export const readOrder = async (id: string): Promise<Order> => {
 export const deleteOrder = async (id: string): Promise<Order> => {
     try {
         const orderDoc = doc(db, 'orders', id);
-        // Lấy dữ liệu đơn hàng trước khi xóa
-        const docSnap = await getDocs(query(collection(db, 'orders')));
-        const found = docSnap.docs.find((d) => d.id === id);
-        if (!found) {
+        const docSnap = await getDoc(orderDoc);
+        if (!docSnap.exists()) {
             throw new Error('Order not found');
         }
-        const deletedOrder = { id: found.id, ...found.data() } as Order;
+        const deletedOrder = { id: docSnap.id, ...docSnap.data() } as Order;
         await deleteDoc(orderDoc);
         console.log("Document deleted successfully!");
         return deletedOrder;
