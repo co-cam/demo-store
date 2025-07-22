@@ -70,8 +70,14 @@ export type Order = {
     payment_token?: string,
     payment_id?: string,
     lastest_error?: string,
+    links?: Link[], // for API links like "order", "pay", etc.
 
     // metadata
     createdAt?: string,
     updatedAt?: string,
+}
+
+export type Link = {
+    rel: string,
+    href: string,
 }

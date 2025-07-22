@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Product, ProductVariant } from '@/types';
 import PaymentButton from './PaymentButton';
+import CheckoutButton from './CheckoutButton';
 
 interface ProductCardProps {
     product: Product;
@@ -20,6 +21,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     });
     const [quantity, setQuantity] = useState(1);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+    const [paynowNote, setPaynowNote] = useState('');
+    const [checkoutNote, setCheckoutNote] = useState('');
 
     // Update selected variant when options change
     const handleOptionChange = (optionName: string, value: string) => {
@@ -61,7 +64,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                         />
                     </div>
-                    
+
                     {/* Image thumbnails */}
                     {product.images.length > 1 && (
                         <div className="flex gap-2 overflow-x-auto">
@@ -69,11 +72,10 @@ export default function ProductCard({ product }: ProductCardProps) {
                                 <button
                                     key={index}
                                     onClick={() => setSelectedImageIndex(index)}
-                                    className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border-2 ${
-                                        selectedImageIndex === index 
-                                            ? 'border-blue-500' 
-                                            : 'border-gray-200 hover:border-gray-300'
-                                    }`}
+                                    className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border-2 ${selectedImageIndex === index
+                                        ? 'border-blue-500'
+                                        : 'border-gray-200 hover:border-gray-300'
+                                        }`}
                                 >
                                     <Image
                                         src={image}
@@ -93,7 +95,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
                         <p className="text-sm text-gray-600 mb-4">by {product.vendor}</p>
-                        
+
                         {/* Pricing */}
                         <div className="flex items-center gap-3 mb-4">
                             <span className="text-2xl font-bold text-gray-900">
@@ -141,11 +143,10 @@ export default function ProductCard({ product }: ProductCardProps) {
                                             <button
                                                 key={value}
                                                 onClick={() => handleOptionChange(option.name, value)}
-                                                className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors ${
-                                                    selectedOptions[option.name] === value
-                                                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                        : 'border-gray-300 hover:border-gray-400'
-                                                }`}
+                                                className={`px-4 py-2 border rounded-md text-sm font-medium transition-colors ${selectedOptions[option.name] === value
+                                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                    : 'border-gray-300 hover:border-gray-400'
+                                                    }`}
                                             >
                                                 {value}
                                             </button>
@@ -196,14 +197,63 @@ export default function ProductCard({ product }: ProductCardProps) {
 
                         {/* Payment Button */}
                         <div className="mt-8">
-                            <PaymentButton
-                                orderLines={[{
-                                    sku: selectedVariant.sku,
-                                    quantity: quantity,
-                                    default_price: selectedVariant.default_price
-                                }]}
-                                disabled={!selectedVariant.available || selectedVariant.inventory_quantity === 0}
-                            />
+                            <div className="flex flex-col gap-6">
+                                {/* Payment Button */}
+                                <div className="flex flex-col items-center">
+                                    <div className="w-[300px] h-[55px]">
+                                        <PaymentButton
+                                            orderLines={[{
+                                                sku: selectedVariant.sku,
+                                                quantity: quantity,
+                                                default_price: selectedVariant.default_price
+                                            }]}
+                                            disabled={!selectedVariant.available || selectedVariant.inventory_quantity === 0}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-2 text-center max-w-[300px]">
+                                        Pay immediately. A pop-up or new tab will open for you to complete the payment.
+                                    </p>
+                                </div>
+
+
+                                {/* Checkout Button */}
+                                <div className="flex flex-col items-center">
+                                    <div className="w-[300px] h-[55px]">
+                                        <CheckoutButton
+                                            orderLines={[{
+                                                sku: selectedVariant.sku,
+                                                quantity: quantity,
+                                                default_price: selectedVariant.default_price
+                                            }]}
+                                            type='checkout'
+                                            setNote={setCheckoutNote}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-2 text-center max-w-[300px]">
+                                        Proceed to checkout. You will be redirected to the checkout page before making your payment.
+                                        {checkoutNote && <span className="block mt-1">{checkoutNote}</span>}
+                                    </p>
+                                </div>
+
+                                {/* Pay Now Button */}
+                                <div className="flex flex-col items-center">
+                                    <div className="w-[300px] h-[55px]">
+                                        <CheckoutButton
+                                            orderLines={[{
+                                                sku: selectedVariant.sku,
+                                                quantity: quantity,
+                                                default_price: selectedVariant.default_price
+                                            }]}
+                                            type='pay_now'
+                                            setNote={setPaynowNote}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-2 text-center max-w-[300px]">
+                                        Pay immediately. You will be redirected directly to the payment page.
+                                        {paynowNote && <span className="block mt-1">{paynowNote}</span>}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Tags */}

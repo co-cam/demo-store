@@ -58,6 +58,8 @@ export async function POST(request: Request) {
 
         order = await addOrder(order);
 
+        // Lấy origin từ headers
+        const origin = request.headers.get("origin") || `https://${request.headers.get("host")}`;
         const requestBody = {
             amount: order.amount,
             subtotal: order.subtotal,
@@ -71,7 +73,9 @@ export async function POST(request: Request) {
                 image_url: line.image_url,
                 compared_price: line.compared_price,
                 properties: line.properties || []
-            }))
+            })),
+            success_url: origin + "/thankyou?orderId=" + order.id,
+            cancel_url: origin + "/thankyou?orderId=" + order.id,
         };
 
         try {
@@ -103,6 +107,7 @@ export async function POST(request: Request) {
             if (data && data.payment_token) {
                 order.payment_token = data.payment_token;
                 order.payment_id = data.id;
+                order.links = data.links || [];
             }
         } catch (error) {
             console.error('Error calling API:', error);
