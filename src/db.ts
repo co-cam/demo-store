@@ -6,10 +6,10 @@ let orders: Order[] = [];
 const productVariants: ProductVariant[] = [
     {
         sku: "premium-tshirt-black-s",
-        default_price: 2.999,
+        default_price: 2,
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
-        compared_price: 3.999,
+        compared_price: 3,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -24,10 +24,10 @@ const productVariants: ProductVariant[] = [
     },
     {
         sku: "premium-tshirt-black-m",
-        default_price: 2.999,
+        default_price: 2,
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
-        compared_price: 3.999,
+        compared_price: 3,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -42,10 +42,10 @@ const productVariants: ProductVariant[] = [
     },
     {
         sku: "premium-tshirt-black-l",
-        default_price: 2.999,
+        default_price: 2,
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
-        compared_price: 3.999,
+        compared_price: 3,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -60,10 +60,10 @@ const productVariants: ProductVariant[] = [
     },
     {
         sku: "premium-tshirt-white-s",
-        default_price: 2.999,
+        default_price: 2,
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500&h=500&fit=crop",
-        compared_price: 3.999,
+        compared_price: 3,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -78,10 +78,10 @@ const productVariants: ProductVariant[] = [
     },
     {
         sku: "premium-tshirt-white-m",
-        default_price: 2.999,
+        default_price: 2,
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500&h=500&fit=crop",
-        compared_price: 3.999,
+        compared_price: 3,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
@@ -96,10 +96,10 @@ const productVariants: ProductVariant[] = [
     },
     {
         sku: "premium-tshirt-white-l",
-        default_price: 2.999,
+        default_price: 2,
         product_title: "Premium Cotton T-Shirt",
         image_url: "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500&h=500&fit=crop",
-        compared_price: 3.999,
+        compared_price: 3,
         properties: [
             { key: "material", value: "100% Organic Cotton" },
             { key: "fit", value: "Regular" },
