@@ -56,12 +56,15 @@ export async function POST(request: Request) {
 
         order.amount = order.subtotal + (order.shipping_fee || 0) + (order.tax_price || 0) + (order.tip_price || 0);
 
+        order.shipping_fee = 1.99; // sample shipping fee
+
         order = await addOrder(order);
 
         // Lấy origin từ headers
         const origin = request.headers.get("origin") || `https://${request.headers.get("host")}`;
         const requestBody = {
             amount: order.amount,
+            currency: order.currency || 'USD',
             subtotal: order.subtotal,
             shipping_name: "Free",
             shipping_fee: order.shipping_fee || 0,
