@@ -56,6 +56,7 @@ export type Order = {
     id?: string,
     status?: string,
     amount?: number, // total
+    currency?: string, // e.g. "USD"
     discount_code?: string,
     discount_percent?: number,
     shipping_name?: string,
