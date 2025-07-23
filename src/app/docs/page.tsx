@@ -213,8 +213,8 @@ export async function POST(request: Request) {
                       <ul className="list-disc pl-6">
                         <li>Receives the order ID from the URL parameters and validates it.</li>
                         <li>Retrieves the order from your database (requires implementing <code>getOrderById</code>).</li>
-                        <li>Calls the Onecheckout API to check the payment status for the order's payment ID.</li>
-                        <li>If the payment is marked as 'PAID', updates the order status to 'success' (requires implementing <code>updateOrder</code>).</li>
+                        <li>Calls the Onecheckout API to check the payment status for the order&apos;s payment ID.</li>
+                        <li>If the payment is marked as &apos;PAID&apos;, updates the order status to &apos;success&apos; (requires implementing <code>updateOrder</code>).</li>
                         <li>Returns the updated order as a JSON response, or handles errors appropriately.</li>
                       </ul>
                       <p><strong>Key variables/functions:</strong></p>
@@ -483,7 +483,7 @@ export default PaymentButton;`}</code>
                       <p><strong>Key variables/functions:</strong></p>
                       <ul className="list-disc pl-6">
                         <li><code>createOrder</code>: Creates the order and handles redirection.</li>
-                        <li><code>type</code>: Button type, either 'pay_now' or 'checkout'.</li>
+                        <li><code>type</code>: Button type, either &apos;pay_now&apos; or &apos;checkout&apos;.</li>
                       </ul>
                       <p>Includes error handling and UI feedback for a smooth user experience.</p>
                     </blockquote>
