@@ -1,15 +1,13 @@
 // services/orderService.js
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, getDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { connectDB } from './firebase';
 import { Order } from './types';
-
-const ordersCollectionRef = collection(db, 'orders');
 
 // Thêm đơn hàng mới
 export const addOrder = async (orderData: Order): Promise<Order> => {
     console.log('Adding order:', orderData);
     try {
-        const docRef = await addDoc(ordersCollectionRef, {
+        const docRef = await addDoc(collection(connectDB(), 'orders'), {
             ...orderData,
             orderDate: new Date(), // Thêm thời gian tạo đơn hàng
             status: 'pending', // Trạng thái mặc định
@@ -28,7 +26,7 @@ export const addOrder = async (orderData: Order): Promise<Order> => {
 export const getOrders = async (): Promise<Order[]> => {
     console.log('Fetching all orders');
     try {
-        const q = query(ordersCollectionRef, orderBy('orderDate', 'desc')); // Sắp xếp theo ngày tạo mới nhất
+        const q = query(collection(connectDB(), 'orders'), orderBy('orderDate', 'desc')); // Sắp xếp theo ngày tạo mới nhất
         const data = await getDocs(q);
         const orders: Order[] = data.docs.map((doc) => ({ ...doc.data(), id: doc.id } as Order));
         console.log('Orders fetched:', orders.length);
@@ -43,7 +41,7 @@ export const getOrders = async (): Promise<Order[]> => {
 export const updateOrder = async (id: string, updatedData: Partial<Order>): Promise<Order> => {
     console.log('Updating order ID:', id);
     try {
-        const orderDoc = doc(db, 'orders', id);
+        const orderDoc = doc(connectDB(), 'orders', id);
         const docSnap = await getDoc(orderDoc);
 
         if (!docSnap.exists()) {
@@ -70,7 +68,7 @@ export const updateOrder = async (id: string, updatedData: Partial<Order>): Prom
 export const readOrder = async (id: string): Promise<Order> => {
     console.log('Reading order ID:', id);
     try {
-        const orderDoc = doc(db, 'orders', id);
+        const orderDoc = doc(connectDB(), 'orders', id);
         console.log("reading order document with ID:", id, 1);
         const docSnap = await getDoc(orderDoc);
         console.log("reading order document with ID:", id, 2);
@@ -95,7 +93,7 @@ export const readOrder = async (id: string): Promise<Order> => {
 
 export const deleteOrder = async (id: string): Promise<Order> => {
     try {
-        const orderDoc = doc(db, 'orders', id);
+        const orderDoc = doc(connectDB(), 'orders', id);
         const docSnap = await getDoc(orderDoc);
 
         if (!docSnap.exists()) {
