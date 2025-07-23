@@ -206,7 +206,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
 ## Client-Side Implementation
 
-### 1. Payment Button Component
+### 1a. Payment Button Component
 
 Create a reusable payment button component that handles the Onecheckout SDK:
 
@@ -378,6 +378,113 @@ const PaymentButton = ({
 export default PaymentButton;
 ```
 
+### 1b. Checkout Button Component
+
+
+Create a reusable checkout button component (`CheckoutButton`) that handles order creation logic and redirects users to the payment or order page:
+
+> **Explanation:**
+>
+> The React component `CheckoutButton` integrates the Onecheckout payment flow into your Next.js app. It:
+> - Calls the order creation API via the `/api/orders` endpoint and retrieves the payment token and payment/order links.
+> - Depending on the button type (`pay_now` or `checkout`), redirects users to the Onecheckout payment or order page.
+> - Shows loading state and disables the button when needed.
+> - Optionally accepts a `setNote` callback to return order info if no redirect link is available.
+>
+> **Key variables/functions:**
+> - `createOrder`: Creates the order and handles redirection.
+> - `type`: Button type, either 'pay_now' or 'checkout'.
+>
+> Includes error handling and UI feedback for a smooth user experience.
+
+```typescript
+// src/components/CheckoutButton.tsx
+'use client';
+
+import { useState } from "react";
+
+let currentOrderId: string | null = null;
+
+interface OrderLineInput {
+    sku: string;
+    quantity: number;
+    default_price: number;
+}
+
+const CheckoutButton = ({
+    orderLines,
+    disabled = false,
+    type = 'pay_now',
+    setNote,
+}: {
+    orderLines?: OrderLineInput[];
+    disabled?: boolean;
+    type?: 'pay_now' | 'checkout';
+    setNote?: (note: string) => void;
+}) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    async function createOrder() {
+        if (disabled) return false;
+
+        setIsLoading(true);
+        let paymentToken: string | boolean = false;
+        try {
+            const orderData = orderLines || [
+                { quantity: 1, sku: 'premium-tshirt-black-s', default_price: 1999 },
+            ];
+
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_lines: orderData,
+                }),
+            });
+            if (!response.ok) {
+                const errorData: any = await response.json();
+                throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
+            }
+            const data: any = await response.json();
+            paymentToken = data?.order?.payment_token || false;
+            currentOrderId = data?.order?.id || null;
+
+            const links = data?.order?.links || [];
+            for (const link of links) {
+                if (link.rel === 'pay' && type === 'pay_now') {
+                    window.location.href = link.href;
+                    return paymentToken;
+                }
+                if (link.rel === 'order' && type === 'checkout') {
+                    window.location.href = link.href;
+                    return paymentToken;
+                }
+            }
+        } catch (error) {
+            console.error('Error calling internal API:', error);
+        } finally {
+            setIsLoading(false);
+        }
+        setNote?.(`Order created with ID: ${currentOrderId}, no redirect link available`);
+        return paymentToken;
+    }
+
+    return (
+        <button
+            onClick={createOrder}
+            disabled={isLoading || disabled}
+            className={`w-full h-full px-6 py-2 rounded-lg font-semibold transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                ${isLoading || disabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+        >
+            {isLoading ? 'Processing...' : (type === 'pay_now' ? 'Pay now' : 'Proceed to Checkout')}
+        </button>
+    );
+}
+
+export default CheckoutButton;
+```
 
 ### 2. Product Page
 
@@ -399,6 +506,10 @@ export default function ProductPage() {
             <h1>Premium T-Shirt</h1>
             <p>$19.99</p>
             <PaymentButton orderLines={orderLines} />
+            {/* or */}
+            <CheckoutButton orderLines={orderLines} type="pay_now" />
+            {/* or */}
+            <CheckoutButton orderLines={orderLines} type="checkout" />
         </div>
     );
 }

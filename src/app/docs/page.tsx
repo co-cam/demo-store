@@ -296,7 +296,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                 
                 <div className="space-y-8">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">1. Payment Button Component</h3>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">1a. Payment Button Component</h3>
                     <p className="text-gray-700 mb-4">
                       Create a reusable payment button component that handles the Onecheckout SDK:
                     </p>
@@ -467,6 +467,119 @@ export default PaymentButton;`}</code>
                   </div>
 
                   <div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">1b. Checkout Button Component</h3>
+                    <p className="text-gray-700 mb-4">
+                      Create a reusable checkout button component (<code className="bg-gray-100 px-2 py-1 rounded text-sm">CheckoutButton</code>) that handles order creation logic and redirects users to the payment or order page:
+                    </p>
+                    <blockquote className="bg-gray-100 border-l-4 border-blue-500 text-blue-700 p-4">
+                      <p><strong>Explanation:</strong></p>
+                      <p>The React component <code>CheckoutButton</code> integrates the Onecheckout payment flow into your Next.js app. It:</p>
+                      <ul className="list-disc pl-6">
+                        <li>Calls the order creation API via the <code>/api/orders</code> endpoint and retrieves the payment token and payment/order links.</li>
+                        <li>Depending on the button type (<code>pay_now</code> or <code>checkout</code>), redirects users to the Onecheckout payment or order page.</li>
+                        <li>Shows loading state and disables the button when needed.</li>
+                        <li>Optionally accepts a <code>setNote</code> callback to return order info if no redirect link is available.</li>
+                      </ul>
+                      <p><strong>Key variables/functions:</strong></p>
+                      <ul className="list-disc pl-6">
+                        <li><code>createOrder</code>: Creates the order and handles redirection.</li>
+                        <li><code>type</code>: Button type, either 'pay_now' or 'checkout'.</li>
+                      </ul>
+                      <p>Includes error handling and UI feedback for a smooth user experience.</p>
+                    </blockquote>
+                    <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto max-h-96">
+                      <pre className="text-sm text-gray-100">
+                        <code>{`// src/components/CheckoutButton.tsx
+'use client';
+
+import { useState } from "react";
+
+let currentOrderId: string | null = null;
+
+interface OrderLineInput {
+    sku: string;
+    quantity: number;
+    default_price: number;
+}
+
+const CheckoutButton = ({
+    orderLines,
+    disabled = false,
+    type = 'pay_now',
+    setNote,
+}: {
+    orderLines?: OrderLineInput[];
+    disabled?: boolean;
+    type?: 'pay_now' | 'checkout';
+    setNote?: (note: string) => void;
+}) => {
+    const [isLoading, setIsLoading] = useState(false);
+
+    async function createOrder() {
+        if (disabled) return false;
+
+        setIsLoading(true);
+        let paymentToken: string | boolean = false;
+        try {
+            const orderData = orderLines || [
+                { quantity: 1, sku: 'premium-tshirt-black-s', default_price: 1999 },
+            ];
+
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_lines: orderData,
+                }),
+            });
+            if (!response.ok) {
+                const errorData: any = await response.json();
+                throw new Error(\`HTTP error! Status: \${response.status}, Message: \${errorData.message || 'Unknown error'}\`);
+            }
+            const data: any = await response.json();
+            paymentToken = data?.order?.payment_token || false;
+            currentOrderId = data?.order?.id || null;
+
+            const links = data?.order?.links || [];
+            for (const link of links) {
+                if (link.rel === 'pay' && type === 'pay_now') {
+                    window.location.href = link.href;
+                    return paymentToken;
+                }
+                if (link.rel === 'order' && type === 'checkout') {
+                    window.location.href = link.href;
+                    return paymentToken;
+                }
+            }
+        } catch (error) {
+            console.error('Error calling internal API:', error);
+        } finally {
+            setIsLoading(false);
+        }
+        setNote?.(\`Order created with ID: \${currentOrderId}, no redirect link available\`);
+        return paymentToken;
+    }
+
+    return (
+        <button
+            onClick={createOrder}
+            disabled={isLoading || disabled}
+            className={\`w-full h-full px-6 py-2 rounded-lg font-semibold transition-colors duration-200 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                \${isLoading || disabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 text-white'}\`}
+        >
+            {isLoading ? 'Processing...' : (type === 'pay_now' ? 'Pay now' : 'Proceed to Checkout')}
+        </button>
+    );
+}
+
+export default CheckoutButton;`}</code>
+                      </pre>
+                    </div>
+                  </div>
+
+                  <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">2. Product Page Implementation</h3>
                     <p className="text-gray-700 mb-4">
                       Use the payment button component in your product page or cart:
@@ -475,6 +588,7 @@ export default PaymentButton;`}</code>
                       <pre className="text-sm text-gray-100">
                         <code>{`// In your product page or cart
 import PaymentButton from '@/components/PaymentButton';
+import CheckoutButton from '@/components/CheckoutButton';
 
 const orderLines = [
     {
@@ -490,6 +604,10 @@ export default function ProductPage() {
             <h1>Premium T-Shirt</h1>
             <p>$19.99</p>
             <PaymentButton orderLines={orderLines} />
+            {/* or */}
+            <CheckoutButton orderLines={orderLines} type="pay_now" />
+            {/* or */}
+            <CheckoutButton orderLines={orderLines} type="checkout" />
         </div>
     );
 }`}</code>
