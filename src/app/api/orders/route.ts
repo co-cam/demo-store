@@ -32,9 +32,9 @@ export async function POST(request: Request) {
                 const { sku, default_price, product_title, image_url, compared_price, properties } = variant;
                 return {
                     ...line, // keep quantity from line
-                    sku,
-                    default_price,
-                    product_title: product_title,
+                    sku: sku,
+                    unit_price: default_price,
+                    title: product_title,
                     image_url,
                     compared_price,
                     properties
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         order.subtotal = (order.order_lines ?? []).reduce((sum, line) => {
             // Find the variant for this line
             const variant = productVariants.find(v => v.sku === line.sku);
-            const price = variant ? variant.default_price : (line.default_price || 0);
+            const price = variant ? variant.default_price : (line.unit_price || 0);
 
             return sum + price * (line.quantity || 1);
         }, 0);
@@ -70,9 +70,9 @@ export async function POST(request: Request) {
             shipping_fee: order.shipping_fee || 0,
             order_lines: order.order_lines?.map(line => ({
                 quantity: line.quantity,
-                sku: line.sku,
-                default_price: line.default_price,
-                product_title: line.product_title,
+                key: line.sku,
+                unit_price: line.unit_price,
+                title: line.title,
                 image_url: line.image_url,
                 compared_price: line.compared_price,
                 properties: line.properties || []

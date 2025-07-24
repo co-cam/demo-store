@@ -1,12 +1,11 @@
 export type OrderLine = {
     sku?: string,
     quantity: number,
-    default_price: number,
-    product_title: string,
+    unit_price: number,
+    title: string,
     image_url: string,
     compared_price: number,
     properties: KV[],
-    discount_value: number,
 }
 
 export type ProductVariant = {
@@ -59,7 +58,7 @@ export type Order = {
     amount?: number, // total
     currency?: string, // e.g. "USD"
     discount_code?: string,
-    discount_percent?: number,
+    discount_amount?: number,
     shipping_name?: string,
     shipping_fee?: number,
     tax_price?: number,

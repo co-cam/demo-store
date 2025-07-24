@@ -128,7 +128,7 @@ function ThankYouContent() {
                                             {line.image_url ? (
                                                 <Image
                                                     src={line.image_url}
-                                                    alt={line.product_title || 'Product Image'}
+                                                    alt={line.title || 'Product Image'}
                                                     width={64}
                                                     height={64}
                                                     className="w-16 h-16 object-cover rounded"
@@ -142,15 +142,15 @@ function ThankYouContent() {
                                             )}
                                         </div>
                                         <div className="flex-1">
-                                            <h4 className="font-medium text-gray-900">{line.product_title}</h4>
+                                            <h4 className="font-medium text-gray-900">{line.title}</h4>
                                             <p className="text-sm text-gray-600">SKU: {line.sku}</p>
                                             <p className="text-sm text-gray-600">Quantity: {line.quantity}</p>
                                         </div>
                                         <div className="text-right">
                                             <p className="font-medium text-gray-900">
-                                                ${(line.default_price * line.quantity).toFixed(2)}
+                                                ${(line.unit_price * line.quantity).toFixed(2)}
                                             </p>
-                                            {line.compared_price > line.default_price && (
+                                            {line.compared_price > line.unit_price && (
                                                 <p className="text-sm text-gray-500 line-through">
                                                     ${(line.compared_price * line.quantity).toFixed(2)}
                                                 </p>
@@ -174,7 +174,7 @@ function ThankYouContent() {
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-600">Subtotal</span>
-                                <span className="text-gray-900">${(order.subtotal || 0).toFixed(2)}</span>
+                                <span className="text-gray-900">${(order.order_lines?.reduce((sum, line) => sum + (line.unit_price * line.quantity), 0) || 0).toFixed(2)}</span>
                             </div>
                             {order.shipping_fee && (
                                 <div className="flex justify-between text-sm">
