@@ -2,10 +2,11 @@ export type OrderLine = {
     sku?: string,
     quantity: number,
     default_price: number,
-    title: string,
+    product_title: string,
     image_url: string,
     compared_price: number,
     properties: KV[],
+    discount_value: number,
 }
 
 export type ProductVariant = {

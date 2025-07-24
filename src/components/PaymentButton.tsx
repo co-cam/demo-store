@@ -21,6 +21,7 @@ declare global {
 }
 
 let currentOrderId : string | null = null;
+let currentPaymentId: string | null = null;
 
 interface OrderLineInput {
     sku: string;
@@ -70,6 +71,7 @@ const PaymentButton = ({
             paymentToken = data?.order?.payment_token || false;
             // Store order ID for later use in onApprove
             currentOrderId = data?.order?.id || null;
+            currentPaymentId = data?.order?.payment_id || null;
             console.log('Payment token:', paymentToken);
         } catch (error) {
             console.error('Error calling internal API:', error);
@@ -95,7 +97,7 @@ const PaymentButton = ({
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({}),
+                body: JSON.stringify({ payment_id: currentPaymentId }),
             });
 
             if (!response.ok) {
@@ -109,7 +111,7 @@ const PaymentButton = ({
             // Check if order status is success
             if (data?.status === 'success') {
                 // Redirect to thank you page with order ID
-                window.location.href = `/thankyou?orderId=${currentOrderId}`;
+                window.location.href = `/thankyou?orderId=${currentOrderId}&payment_id=${currentPaymentId}`;
             } else {
                 throw new Error('Order status is not success');
             }

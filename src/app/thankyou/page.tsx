@@ -17,6 +17,7 @@ function ThankYouContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const orderId = searchParams.get('orderId');
+    const paymentId = searchParams.get('payment_id');
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -30,7 +31,7 @@ function ThankYouContent() {
 
         const fetchOrder = async () => {
             try {
-                const response = await fetch(`/api/orders/${orderId}`);
+                const response = await fetch(`/api/orders/${orderId}?payment_id=${paymentId}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch order');
                 }
@@ -127,7 +128,7 @@ function ThankYouContent() {
                                             {line.image_url ? (
                                                 <Image
                                                     src={line.image_url}
-                                                    alt={line.title}
+                                                    alt={line.product_title || 'Product Image'}
                                                     width={64}
                                                     height={64}
                                                     className="w-16 h-16 object-cover rounded"
@@ -141,7 +142,7 @@ function ThankYouContent() {
                                             )}
                                         </div>
                                         <div className="flex-1">
-                                            <h4 className="font-medium text-gray-900">{line.title}</h4>
+                                            <h4 className="font-medium text-gray-900">{line.product_title}</h4>
                                             <p className="text-sm text-gray-600">SKU: {line.sku}</p>
                                             <p className="text-sm text-gray-600">Quantity: {line.quantity}</p>
                                         </div>

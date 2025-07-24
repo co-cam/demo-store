@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Payment_api_url, Payment_api_key } from "@/const";
-import { readOrder, updateOrder } from '@/db2';
+import { Order } from '@/types';
+
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -8,31 +9,38 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         return NextResponse.json({ error: 'Order ID is required' }, { status: 400 });
     }
 
-    console.log('Updating order status to success for ID:', id);
+    // PRODUCTION-required: read order from database and return it if status is success
+    // PRODUCTION-required: read payment_id from existing order
 
-    const order = await readOrder(id);
-    if (!order) {
-        return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    // Lấy payment_id từ query string
+    const { searchParams } = new URL(request.url);
+    let payment_id = searchParams.get('payment_id');
+
+    console.log('Capturing order with ID:', id, 'and payment ID:', payment_id);
+
+    // if read payment_id from request json body
+    if (!payment_id) {
+        try {
+            const body = await request.json();
+            if (body && typeof body.payment_id === 'string') {
+                payment_id = body.payment_id;
+            }
+        } catch (e) {
+            console.error('Error parsing request body:', e);
+            // Ignore JSON parse errors, will handle missing payment_id below
+        }
     }
 
-    try {
-        await request.json();
-    } catch {
-        return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-    }
-
-    if (order.status === 'success') {
-        return NextResponse.json(order);
-    }
-
-    if (!order.payment_id) {
-        return NextResponse.json({ error: 'Payment has not been created yet' }, { status: 400 });
+    if (!payment_id) {
+        return NextResponse.json({ error: 'Payment ID is required' }, { status: 400 });
     }
 
     const patch: Record<string, string | number> = {}
 
+    let order: Order | null = null;
+
     try {
-        const response = await fetch(Payment_api_url + `/${order.payment_id}`, {
+        const response = await fetch(Payment_api_url + `/${payment_id}`, {
             method: 'GET',
             headers: {
                 'api-key': Payment_api_key,
@@ -63,14 +71,27 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                 patch.status = 'success';
             }
         }
+
+        // Map data to order object if needed
+        order = data as Order;
+        if (order && data && data.created && data.updated) {
+            order.createdAt = new Date(data.created).toISOString();
+            order.updatedAt = new Date(data.updated).toISOString();
+        }
     } catch (error) {
         console.error('Error calling API:', error);
         patch.lastest_error = error instanceof Error ? error.message : 'Unknown error';
     }
 
-    const updated = await updateOrder(id, patch);
-    if (!updated) {
-        return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
+    if (order) {
+        order.lastest_error = patch.lastest_error + '';
+        order.status = patch.status + '';
+        order.payment_id = patch.payment_id + '';
+        order.payment_token = patch.payment_token + '';
+        order.id = id; // Ensure the order ID matches the requested ID
     }
-    return NextResponse.json(updated);
+
+    // PRODUCTION-required: update order patch in database
+
+    return NextResponse.json(order);
 }

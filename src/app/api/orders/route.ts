@@ -3,13 +3,12 @@ import { Order } from "@/types";
 import { NextResponse } from 'next/server';
 import { Payment_api_url, Payment_api_key } from "@/const";
 import { getProductVariants } from "@/db";
-import { addOrder, updateOrder, getOrders } from "@/db2";
 
 // CreateOrder API (POST)
 export async function POST(request: Request) {
     try {
         const data: any = await request.json();
-        let order: Order = { ...data };
+        const order: Order = { ...data };
 
         // Get product variants from database
         const productVariants = getProductVariants();
@@ -35,7 +34,7 @@ export async function POST(request: Request) {
                     ...line, // keep quantity from line
                     sku,
                     default_price,
-                    title: product_title,
+                    product_title: product_title,
                     image_url,
                     compared_price,
                     properties
@@ -58,7 +57,8 @@ export async function POST(request: Request) {
 
         order.shipping_fee = 1.99; // sample shipping fee
 
-        order = await addOrder(order);
+        // PRODUCTION-required: insert order into database and return id if you need manage orders in database
+        order.id = "order_id";
 
         // Lấy origin từ headers
         const origin = request.headers.get("origin") || `https://${request.headers.get("host")}`;
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
                 quantity: line.quantity,
                 sku: line.sku,
                 default_price: line.default_price,
-                product_title: line.title,
+                product_title: line.product_title,
                 image_url: line.image_url,
                 compared_price: line.compared_price,
                 properties: line.properties || []
@@ -117,22 +117,10 @@ export async function POST(request: Request) {
             order.lastest_error = error instanceof Error ? error.message : 'Unknown error';
         }
 
-        if (order.id) {
-            await updateOrder(order.id, order)
-        } else {
-            return NextResponse.json({ success: false, error: 'Order ID is required' }, { status: 400 });
-        }
+        // PRODUCTION-required: save order to database if you need manage orders in database
 
         return NextResponse.json({ success: true, order });
     } catch {
         return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 });
     }
-}
-
-// ListOrders API (GET)
-export async function GET() {
-
-    const orders = await getOrders();
-
-    return NextResponse.json({ success: true, orders });
 }
