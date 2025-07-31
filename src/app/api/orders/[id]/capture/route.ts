@@ -69,6 +69,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
             patch.payment_id = data.id;
             if (data.status === 'PAID') {
                 patch.status = 'success';
+            } else {
+                patch.status = 'failed';
             }
         }
 

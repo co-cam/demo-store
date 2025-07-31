@@ -78,7 +78,7 @@ export async function POST(request: Request) {
                 properties: line.properties || []
             })),
             success_url: origin + "/thankyou?orderId=" + order.id,
-            cancel_url: origin + "/thankyou?orderId=" + order.id,
+            cancel_url: origin + "/cancel?orderId=" + order.id, // TODO cancel page
         };
 
         try {
