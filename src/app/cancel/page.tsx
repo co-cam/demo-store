@@ -180,7 +180,7 @@ function CancelContent() {
                     <div className='bg-gray-50 px-6 py-6 text-center border-t border-gray-200'>
                         <div className='space-y-4'>
                             <div className='text-sm text-gray-600 mb-4'>
-                                <p>Don't worry! Your order has been saved and you can try again.</p>
+                                <p>Do not worry! Your order has been saved and you can try again.</p>
                                 <p>If you continue to experience issues, please contact our support team.</p>
                             </div>
                             
