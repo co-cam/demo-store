@@ -155,10 +155,10 @@ function CancelContent() {
                                             <span className='text-gray-900'>${order.shipping_fee.toFixed(2)}</span>
                                         </div>
                                     )}
-                                    {order.tax_price && order.tax_price > 0 && (
+                                    {order.tax_amount && order.tax_amount > 0 && (
                                         <div className='flex justify-between text-sm'>
                                             <span className='text-gray-600'>Tax:</span>
-                                            <span className='text-gray-900'>${order.tax_price.toFixed(2)}</span>
+                                            <span className='text-gray-900'>${order.tax_amount.toFixed(2)}</span>
                                         </div>
                                     )}
                                     {order.tip_price && order.tip_price > 0 && (

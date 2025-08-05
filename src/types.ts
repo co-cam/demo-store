@@ -61,7 +61,7 @@ export type Order = {
     discount_amount?: number,
     shipping_name?: string,
     shipping_fee?: number,
-    tax_price?: number,
+    tax_amount?: number,
     tip_price?: number,
     order_lines?: OrderLine[],
     subtotal?: number,

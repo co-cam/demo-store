@@ -182,10 +182,10 @@ function ThankYouContent() {
                                     <span className="text-gray-900">${order.shipping_fee.toFixed(2)}</span>
                                 </div>
                             )}
-                            {order.tax_price && (
+                            {order.tax_amount && (
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Tax</span>
-                                    <span className="text-gray-900">${order.tax_price.toFixed(2)}</span>
+                                    <span className="text-gray-900">${order.tax_amount.toFixed(2)}</span>
                                 </div>
                             )}
                             {order.tip_price && (

@@ -53,9 +53,10 @@ export async function POST(request: Request) {
             return sum + price * (line.quantity || 1);
         }, 0);
 
-        order.amount = order.subtotal + (order.shipping_fee || 0) + (order.tax_price || 0) + (order.tip_price || 0);
-
         order.shipping_fee = 1.99; // sample shipping fee
+        order.tax_amount = 0.5; // sample tax price
+
+        order.amount = order.subtotal + (order.shipping_fee || 0) + (order.tax_amount || 0) + (order.tip_price || 0);
 
         // PRODUCTION-required: insert order into database and return id if you need manage orders in database
         order.id = "order_id";
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
         const origin = request.headers.get("origin") || `https://${request.headers.get("host")}`;
         const requestBody = {
             amount: order.amount,
+            tax_amount: order.tax_amount || 0,
             currency: order.currency || 'USD',
             subtotal: order.subtotal,
             shipping_name: "Free",
