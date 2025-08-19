@@ -6,7 +6,7 @@
 
 ### 🚀 Live Demo
 
-[View the live demo here](https://demo-store.wecella.workers.dev/)
+[View the live demo here](https://demo-store.sandbox.whatee.io/)
 
 ---
 
