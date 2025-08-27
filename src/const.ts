@@ -6,7 +6,7 @@
 // export const Payment_api_url = 'https://onecheckout.sandbox.whatee.io/api/v1.0/orders';
 // export const Payment_api_key = 'riTsflJlFlllW0JHJN2l7jd2P11Imw5M3ONvanrhwWsII4T8TJPnH3pXiOkgZ8Yq4FrpKTksX7PUd63jevgIJ0Oig82qCtqRnvMFdkwHnUhCD45On8vE5FNYrkWRvN9s';
 
-export const Payment_js_src = 'https://checkout.sandbox.whatee.store/sdk.js'
+export const Payment_js_src = 'https://img.onepagecdn.com/js/vendor/one/sdk.js'
 export const Payment_merchant_id = '4c545235-b950-4dc2-8d76-c2b8d806ce5a';
 export const Payment_api_url = 'https://onecheckout.sandbox.whatee.io/api/v1.0/orders';
 export const Payment_api_key = 'DZkRXORebFa7uc5S6ehpQI4mCaI9X6788mkpEibGYAf41wNd8OmdP0PjLPvoCX1INxuGvfK24JZLkMWiQLptg9PBU8KzrUwcuLUgdhAmEuGYL9bfcd3xEVzROgCc5IGT';
