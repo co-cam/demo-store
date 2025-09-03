@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM oven/bun:1.2.18-alpine AS build
+FROM --platform=$BUILDPLATFORM oven/bun:1.2.21-alpine AS build
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_OPTIONS=--max-old-space-size=2048
 WORKDIR /app
@@ -9,7 +9,7 @@ RUN mv .env.docker .env && \
     bun run --smol build && \
     chmod +x ./start.sh
 
-FROM oven/bun:1.2.18-alpine
+FROM oven/bun:1.2.21-alpine
 RUN apk add --update envsubst supervisor nginx curl && \
     rm -rf /var/cache/apk/* /var/lib/apk/lists/*
 ENV NODE_ENV=production
