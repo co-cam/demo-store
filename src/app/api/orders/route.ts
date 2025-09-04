@@ -53,10 +53,11 @@ export async function POST(request: Request) {
             return sum + price * (line.quantity || 1);
         }, 0);
 
-        order.shipping_fee = 1.99; // sample shipping fee
-        order.tax_amount = 0.5; // sample tax price
+        order.shipping_fee = 1.2; // sample shipping fee
+        order.tax_amount = 0.6; // sample tax price
+        order.discount_amount = 0.2; // sample discount amount
 
-        order.amount = order.subtotal + (order.shipping_fee || 0) + (order.tax_amount || 0) + (order.tip_price || 0);
+        order.amount = order.subtotal + (order.shipping_fee || 0) + (order.tax_amount || 0) + (order.tip_price || 0) - (order.discount_amount || 0);
 
         // PRODUCTION-required: insert order into database and return id if you need manage orders in database
         order.id = "order_id";
@@ -64,8 +65,10 @@ export async function POST(request: Request) {
         // Lấy origin từ headers
         const origin = request.headers.get("origin") || `https://${request.headers.get("host")}`;
         const requestBody = {
+            paypal_manual_capture: false, // true for test
             amount: order.amount,
             tax_amount: order.tax_amount || 0,
+            discount_amount: order.discount_amount || 0,
             currency: order.currency || 'USD',
             subtotal: order.subtotal,
             shipping_name: "Free",
