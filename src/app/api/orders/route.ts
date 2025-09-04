@@ -68,7 +68,7 @@ export async function POST(request: Request) {
             paypal_manual_capture: false, // true for test
             amount: order.amount,
             tax_amount: order.tax_amount || 0,
-            discount_amount: order.discount_amount || 0,
+            // discount_amount: order.discount_amount || 0,
             currency: order.currency || 'USD',
             subtotal: order.subtotal,
             shipping_name: "Free",
