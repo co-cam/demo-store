@@ -58,10 +58,30 @@ export default function DocsPage() {
               {/* Overview Section */}
               <section id="overview">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">Overview</h2>
-                <p className="text-gray-700 leading-relaxed">
-                  This guide demonstrates how to integrate Onecheckout&apos;s payment system with a Next.js demo store, 
-                  covering both client-side checkout components and server-side API routes for order management.
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  This section provides a technical overview for developers on how the Onecheckout integration works in the Next.js demo store.
                 </p>
+                <div className="space-y-4 text-gray-700">
+                  <p className="font-semibold">Main flow (summary):</p>
+                  <ol className="list-decimal list-inside space-y-2 pl-4">
+                    <li>The client sends a request to create an order to the internal endpoint <code className="bg-gray-100 px-1 py-0.5 rounded">POST /api/orders</code> (with <code className="bg-gray-100 px-1 py-0.5 rounded">order_lines</code>).</li>
+                    <li>The server (file <code className="bg-gray-100 px-1 py-0.5 rounded">src/app/api/orders/route.ts</code>) validates SKUs against the product database (<code className="bg-gray-100 px-1 py-0.5 rounded">src/db.ts</code>), overwrites line info with variant data, calculates <code className="bg-gray-100 px-1 py-0.5 rounded">subtotal</code>/<code className="bg-gray-100 px-1 py-0.5 rounded">amount</code>, and generates <code className="bg-gray-100 px-1 py-0.5 rounded">order.id</code>.</li>
+                    <li>The server calls the Onecheckout API (URL and api-key from <code className="bg-gray-100 px-1 py-0.5 rounded">src/const.ts</code>) to initialize payment, receives <code className="bg-gray-100 px-1 py-0.5 rounded">payment_token</code>, <code className="bg-gray-100 px-1 py-0.5 rounded">payment_id</code>, and <code className="bg-gray-100 px-1 py-0.5 rounded">links</code> (redirect/pay links).</li>
+                    <li>The client uses the <code className="bg-gray-100 px-1 py-0.5 rounded">payment_token</code> (SDK) or redirects to <code className="bg-gray-100 px-1 py-0.5 rounded">links</code> for the customer to complete payment on Onecheckout.</li>
+                    <li>After payment, Onecheckout can redirect the client to <code className="bg-gray-100 px-1 py-0.5 rounded">success_url</code> (e.g. <code className="bg-gray-100 px-1 py-0.5 rounded">/thankyou?orderId=...&payment_id=...</code>) or send a webhook; the server will check status via the internal endpoint <code className="bg-gray-100 px-1 py-0.5 rounded">POST /api/orders/[id]/capture</code> (or call Onecheckout <code className="bg-gray-100 px-1 py-0.5 rounded">GET /{'{payment_id}'}</code>) to confirm and update order status.</li>
+                  </ol>
+                  <p className="font-semibold mt-4">Key endpoints & files:</p>
+                  <ul className="list-disc list-inside space-y-2 pl-4">
+                    <li><code className="bg-gray-100 px-1 py-0.5 rounded">POST /api/orders</code> — <code className="bg-gray-100 px-1 py-0.5 rounded">src/app/api/orders/route.ts</code> (create order, call Onecheckout)</li>
+                    <li><code className="bg-gray-100 px-1 py-0.5 rounded">POST /api/orders/[id]/capture</code> — <code className="bg-gray-100 px-1 py-0.5 rounded">src/app/api/orders/[id]/capture/route.ts</code> (check/capture payment)</li>
+                    <li><code className="bg-gray-100 px-1 py-0.5 rounded">src/const.ts</code> — configures <code className="bg-gray-100 px-1 py-0.5 rounded">Payment_api_url</code>, <code className="bg-gray-100 px-1 py-0.5 rounded">Payment_api_key</code>, <code className="bg-gray-100 px-1 py-0.5 rounded">Payment_js_src</code>, <code className="bg-gray-100 px-1 py-0.5 rounded">Payment_merchant_id</code></li>
+                    <li>Client components: <code className="bg-gray-100 px-1 py-0.5 rounded">src/components/PaymentButton.tsx</code>, <code className="bg-gray-100 px-1 py-0.5 rounded">src/components/CheckoutButton.tsx</code></li>
+                    <li>UX: <code className="bg-gray-100 px-1 py-0.5 rounded">src/app/thankyou/page.tsx</code> (displays order status after redirect)</li>
+                  </ul>
+                  <p className="mt-4">
+                    The detailed guide below describes each endpoint, component, and example payload.
+                  </p>
+                </div>
               </section>
 
               {/* Prerequisites Section */}
@@ -87,16 +107,10 @@ export default function DocsPage() {
                     <pre className="text-sm text-gray-100">
                       <code>{`// src/const.ts
 // Can be read from environment variables or a config file
-export const Payment_js_src = 'https://checkout.sandbox.whatee.store/sdk.js'; // Production: use live URL
+export const Payment_js_src = 'https://demo-store.sandbox.whatee.io/sdk.js'; // Production: use live URL
 export const Payment_merchant_id = 'your-merchant-id'; // Replace with actual merchant ID
 export const Payment_api_url = 'https://onecheckout.sandbox.whatee.io/api/v1.0/orders'; // Production: use live URL
-export const Payment_api_key = 'your-api-key'; // Replace with actual API key
-
-// Example local development configuration:
-// export const Payment_js_src = 'http://localhost:3000/sdk.js'
-// export const Payment_merchant_id = 'your-local-merchant-id';
-// export const Payment_api_url = 'http://localhost:9000/api/v1.0/orders';
-// export const Payment_api_key = 'your-local-api-key';`}</code>
+export const Payment_api_key = 'your-api-key'; // Replace with actual API key`}</code>
                     </pre>
                   </div>
                 </div>
@@ -398,202 +412,29 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">1a. Payment Button Component</h3>
                     <p className="text-gray-700 mb-4">
-                      Create a reusable payment button component that handles the Onecheckout SDK:
+                      Create a reusable payment button component that handles the Onecheckout SDK. Detailed setup information is available in the source code.
                     </p>
-                    <blockquote className="bg-gray-100 border-l-4 border-blue-500 text-blue-700 p-4">
-                      <p><strong>Explanation:</strong></p>
-                      <p>This code defines a reusable React component (<code>PaymentButton</code>) for integrating the Onecheckout payment SDK in a Next.js app. It:</p>
-                      <ul className="list-disc pl-6">
-                        <li>Dynamically loads the Onecheckout SDK and renders a payment button with proper loading states</li>
-                        <li>Handles order creation by calling the <code>/api/orders</code> endpoint and stores order/payment IDs</li>
-                        <li>Manages payment approval by capturing payment via <code>/api/orders/[orderId]/capture</code> with payment_id</li>
-                        <li>Includes comprehensive error handling and prevents duplicate button rendering</li>
-                        <li>Provides smooth user experience with loading indicators and proper state management</li>
-                      </ul>
-                      <p><strong>Key variables/functions:</strong></p>
-                      <ul className="list-disc pl-6">
-                        <li><code>createOrder</code>: Creates an order and returns a payment token</li>
-                        <li><code>onApprove</code>: Captures payment and redirects to thank you page</li>
-                        <li><code>initPayment</code>: Loads SDK and initializes the payment button</li>
-                        <li><code>currentOrderId</code>/<code>currentPaymentId</code>: Store payment session data</li>
-                      </ul>
-                    </blockquote>
-                    <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto max-h-96">
-                      <pre className="text-sm text-gray-100">
-                        <code>{`// src/components/PaymentButton.tsx
-'use client';
-
-import { useEffect, useState, useId } from "react";
-import { Payment_js_src, Payment_merchant_id } from '../const';
-
-interface OrderLineInput {
-    sku: string;
-    quantity: number;
-    default_price: number;
-}
-
-const PaymentButton = ({
-    orderLines,
-    disabled = false
-}: {
-    orderLines?: OrderLineInput[];
-    disabled?: boolean;
-}) => {
-    const btnId = useId();
-    const [isIniting, setIsIniting] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-    
-    let currentOrderId: string | null = null;
-
-    // Create order and get payment token
-    async function createOrder() {
-        if (disabled) return false;
-        
-        setIsLoading(true);
-        try {
-            const orderData = orderLines || [
-                { quantity: 1, sku: 'premium-tshirt-black-s', default_price: 1999 },
-            ];
-
-            const response = await fetch('/api/orders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ order_lines: orderData }),
-            });
-
-            if (!response.ok) {
-                throw new Error(\`HTTP error! Status: \${response.status}\`);
-            }
-
-            const data: any = await response.json();
-            currentOrderId = data?.order?.id || null;
-            return data?.order?.payment_token || false;
-        } catch (error) {
-            console.error('Error creating order:', error);
-            return false;
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    // Handle successful payment
-    async function onApprove() {
-        if (!currentOrderId) return;
-        
-        setIsLoading(true);
-        try {
-            const response = await fetch(\`/api/orders/\${currentOrderId}/capture\`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({}),
-            });
-
-            if (!response.ok) {
-                throw new Error(\`HTTP error! Status: \${response.status}\`);
-            }
-
-            const data: any = await response.json();
-            
-            if (data?.status === 'success') {
-                window.location.href = \`/thankyou?orderId=\${currentOrderId}\`;
-            }
-        } catch (error) {
-            console.error("Payment capture error:", error);
-            alert('Payment was successful but there was an error. Please contact support.');
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    // Initialize Onecheckout SDK
-    function initPayment() {
-        if (typeof window === "undefined" || window.onecheckout) {
-            setIsIniting(false);
-            return;
-        }
-
-        const script = document.createElement('script');
-        script.src = \`\${Payment_js_src}?merchant_id=\${Payment_merchant_id}\`;
-        
-        script.onload = () => {
-            if (window.onecheckout) {
-                const paymentButton = window.onecheckout.Buttons({
-                    style: {
-                        color: 'gold',
-                        height: '55px',
-                        layout: 'horizontal',
-                        size: 'medium',
-                        shape: 'rect',
-                    },
-                    createOrder,
-                    onApprove,
-                    onCancel: () => setIsLoading(false),
-                    onError: (err) => {
-                        console.error("Payment error:", err);
-                        setIsLoading(false);
-                    }
-                });
-                
-                paymentButton.render(\`#\${btnId}\`);
-            }
-            setIsIniting(false);
-        };
-
-        document.head.appendChild(script);
-    }
-
-    useEffect(() => {
-        initPayment();
-    }, []);
-
-    return (
-        <div className="relative">
-            {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-4 border-blue-500"></div>
-                </div>
-            )}
-            
-            {disabled ? (
-                <button className="w-full bg-gray-400 text-white font-medium py-3 px-6 rounded-lg cursor-not-allowed">
-                    Out of Stock
-                </button>
-            ) : isIniting ? (
-                <button className="w-full bg-yellow-500 text-white font-medium py-3 px-6 rounded-lg cursor-not-allowed">
-                    Loading Payment...
-                </button>
-            ) : (
-                <div id={btnId}></div>
-            )}
-        </div>
-    );
-};
-
-export default PaymentButton;`}</code>
-                      </pre>
-                    </div>
                   </div>
 
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">1b. Checkout Button Component</h3>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">1b. Checkout Button Component (Recommended)</h3>
                     <p className="text-gray-700 mb-4">
                       Create a reusable checkout button component (<code className="bg-gray-100 px-2 py-1 rounded text-sm">CheckoutButton</code>) that handles order creation logic and redirects users to the payment or order page:
                     </p>
                     <blockquote className="bg-gray-100 border-l-4 border-blue-500 text-blue-700 p-4">
                       <p><strong>Explanation:</strong></p>
-                      <p>The React component <code>CheckoutButton</code> integrates the Onecheckout payment flow into your Next.js app. It:</p>
+                      <p>This component creates orders and redirects users to external Onecheckout pages. It:</p>
                       <ul className="list-disc pl-6">
-                        <li>Calls the order creation API via the <code>/api/orders</code> endpoint and retrieves the payment token and payment/order links.</li>
-                        <li>Depending on the button type (<code>pay_now</code> or <code>checkout</code>), redirects users to the Onecheckout payment or order page.</li>
-                        <li>Shows loading state and disables the button when needed.</li>
-                        <li>Optionally accepts a <code>setNote</code> callback to return order info if no redirect link is available.</li>
+                        <li>Creates orders via <code>/api/orders</code> endpoint and retrieves redirect links</li>
+                        <li>Supports two button types: <code>pay_now</code> (direct payment) and <code>checkout</code> (order page)</li>
+                        <li>Redirects users to appropriate external pages based on returned links</li>
+                        <li>Provides feedback via optional <code>setNote</code> callback when no redirect is available</li>
                       </ul>
-                      <p><strong>Key variables/functions:</strong></p>
+                      <p><strong>Key functions:</strong></p>
                       <ul className="list-disc pl-6">
-                        <li><code>createOrder</code>: Creates the order and handles redirection.</li>
-                        <li><code>type</code>: Button type, either &apos;pay_now&apos; or &apos;checkout&apos;.</li>
+                        <li><code>createOrder</code>: Creates order and handles redirection</li>
+                        <li><code>type</code>: Button behavior - 'pay_now' or 'checkout'</li>
                       </ul>
-                      <p>Includes error handling and UI feedback for a smooth user experience.</p>
                     </blockquote>
                     <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto max-h-96">
                       <pre className="text-sm text-gray-100">
@@ -711,10 +552,12 @@ export default function ProductPage() {
         <div>
             <h1>Premium T-Shirt</h1>
             <p>$19.99</p>
+            
+            {/* SDK Payment Button (pop-up/iframe) */}
             <PaymentButton orderLines={orderLines} />
-            {/* or */}
+            
+            {/* External Redirect Buttons */}
             <CheckoutButton orderLines={orderLines} type="pay_now" />
-            {/* or */}
             <CheckoutButton orderLines={orderLines} type="checkout" />
         </div>
     );
@@ -726,16 +569,16 @@ export default function ProductPage() {
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">3. Thank You Page</h3>
                     <p className="text-gray-700 mb-4">
-                      Create an enhanced thank you page at <code className="bg-gray-100 px-2 py-1 rounded text-sm">src/app/thankyou/page.tsx</code>:
+                      Create a thank you page at <code className="bg-gray-100 px-2 py-1 rounded text-sm">src/app/thankyou/page.tsx</code>:
                     </p>
                     <blockquote className="bg-gray-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4">
                       <p><strong>Explanation:</strong></p>
-                      <p>This enhanced Thank You page includes:</p>
+                      <p>This page handles order confirmation after payment completion. It:</p>
                       <ul className="list-disc pl-6">
-                        <li>Suspense boundary for loading states during server-side rendering</li>
-                        <li>Automatic order fetching and status verification using both orderId and payment_id</li>
-                        <li>Dynamic order details display with comprehensive error handling</li>
-                        <li>Loading indicators and error states for better user experience</li>
+                        <li>Uses Suspense for loading states during server-side rendering</li>
+                        <li>Fetches order details using orderId and payment_id from URL parameters</li>
+                        <li>Displays comprehensive order information with error handling</li>
+                        <li>Provides user-friendly loading and error states</li>
                       </ul>
                     </blockquote>
                     <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
@@ -744,22 +587,22 @@ export default function ProductPage() {
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Order } from '@/types';
 
 export default function ThankYouPage() {
     return (
-        <Suspense fallback={<div className='min-h-screen flex items-center justify-center bg-gray-50'>
-            <div className='animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500'></div>
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
         </div>}>
             <ThankYouContent />
         </Suspense>
     );
 }
+}
 
 function ThankYouContent() {
     const searchParams = useSearchParams();
-    const router = useRouter();
     const orderId = searchParams.get('orderId');
     const paymentId = searchParams.get('payment_id');
     const [order, setOrder] = useState<Order | null>(null);
@@ -775,14 +618,10 @@ function ThankYouContent() {
 
         const fetchOrder = async () => {
             try {
-                const response = await fetch(\`/api/orders/\${orderId}/capture?payment_id=\${paymentId}\`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to fetch order');
-                }
-                const data: any = await response.json();
+                const response = await fetch(\`/api/orders/\${orderId}?payment_id=\${paymentId}\`);
+                if (!response.ok) throw new Error('Failed to fetch order');
+                
+                const data = await response.json();
                 setOrder(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Unknown error');
@@ -795,63 +634,48 @@ function ThankYouContent() {
     }, [orderId, paymentId]);
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
-            </div>
-        );
+        return <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500"></div>
+        </div>;
     }
 
-    if (error) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
-                    <p className="text-gray-600">{error}</p>
-                    <button 
-                        onClick={() => router.push('/')}
-                        className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-                    >
-                        Return to Store
-                    </button>
-                </div>
+    if (error || !order) {
+        return <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+                <div className="text-red-500 text-xl mb-4">❌ Error</div>
+                <p>{error || 'Order not found'}</p>
             </div>
-        );
+        </div>;
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8">
-            <div className="container mx-auto px-4 max-w-2xl">
-                <div className="bg-white rounded-lg shadow-md p-8">
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold text-green-600 mb-2">
-                            Thank You for Your Purchase!
-                        </h1>
-                        <p className="text-gray-600">Your order has been successfully processed.</p>
+        <div className="min-h-screen bg-gray-50 py-12">
+            <div className="max-w-3xl mx-auto px-4">
+                <div className="text-center mb-12">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                        <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
                     </div>
+                    <h1 className="text-3xl font-bold mb-2">Thank You!</h1>
+                    <p className="text-lg text-gray-600">Your order has been successfully processed</p>
+                </div>
 
-                    {order && (
-                        <div className="space-y-6">
-                            <div>
-                                <h2 className="text-lg font-semibold mb-2">Order Details</h2>
-                                <div className="bg-gray-50 rounded-lg p-4">
-                                    <p><strong>Order ID:</strong> {order.id}</p>
-                                    <p><strong>Status:</strong> <span className="text-green-600 font-medium">{order.status}</span></p>
-                                    {order.payment_id && <p><strong>Payment ID:</strong> {order.payment_id}</p>}
-                                    {order.amount && <p><strong>Total:</strong> $\{(order.amount / 100).toFixed(2)}</p>}
-                                </div>
-                            </div>
+                <div className="bg-white rounded-lg shadow-md p-6">
+                    <h2 className="text-xl font-semibold mb-4">Order Details</h2>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-sm text-gray-600">Order ID</p>
+                            <p className="font-medium">{order.id}</p>
                         </div>
-                    )}
-
-                    <div className="mt-8 text-center">
-                        <p className="text-gray-600 mb-4">You will receive a confirmation email shortly.</p>
-                        <button 
-                            onClick={() => router.push('/')}
-                            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                        >
-                            Continue Shopping
-                        </button>
+                        <div>
+                            <p className="text-sm text-gray-600">Status</p>
+                            <p className="font-medium">{order.status}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-600">Total Amount</p>
+                            <p className="font-medium">$\{(order.amount / 100).toFixed(2)}</p>
+                        </div>
                     </div>
                 </div>
             </div>

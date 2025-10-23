@@ -16,6 +16,12 @@ export default function Home() {
               <h1 className="text-2xl font-bold text-gray-900">Demo Store</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Link
+                href="/docs_api"
+                className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
+              >
+                📘 API Docs
+              </Link>
               <Link 
                 href="/docs" 
                 className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors"
@@ -88,6 +94,10 @@ export default function Home() {
           <div className="text-center">
             <p className="text-gray-600 mb-2">© 2024 Demo Store. Built with Next.js and integrated payment processing.</p>
             <div className="flex justify-center space-x-4 text-sm">
+              <Link href="/docs_api" className="text-blue-600 hover:text-blue-800">
+                📘 API Docs
+              </Link>
+              <span className="text-gray-400">|</span>
               <Link href="/docs" className="text-blue-600 hover:text-blue-800">
                 📚 Integration Guide
               </Link>
