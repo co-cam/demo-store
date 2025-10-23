@@ -433,13 +433,13 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
                       <p><strong>Key functions:</strong></p>
                       <ul className="list-disc pl-6">
                         <li><code>createOrder</code>: Creates order and handles redirection</li>
-                        <li><code>type</code>: Button behavior - 'pay_now' or 'checkout'</li>
+                        <li><code>type</code>: {"Button behavior - 'pay_now' or 'checkout'"}</li>
                       </ul>
                     </blockquote>
                     <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto max-h-96">
                       <pre className="text-sm text-gray-100">
                         <code>{`// src/components/CheckoutButton.tsx
-'use client';
+&apos;use client&apos;;
 
 import { useState } from "react";
 
