@@ -188,12 +188,24 @@ function ThankYouContent() {
                                     <span className="text-gray-900">${order.tax_amount.toFixed(2)}</span>
                                 </div>
                             )}
+                                {order.discount_amount !== undefined && order.discount_amount > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Discount</span>
+                                        <span className="text-gray-900">-${order.discount_amount.toFixed(2)}</span>
+                                    </div>
+                                )}
                             {order.tip_price && (
                                 <div className="flex justify-between text-sm">
                                     <span className="text-gray-600">Tip</span>
                                     <span className="text-gray-900">${order.tip_price.toFixed(2)}</span>
                                 </div>
                             )}
+                                {order.currency && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Currency</span>
+                                        <span className="text-gray-900">{order.currency}</span>
+                                    </div>
+                                )}
                             <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                                 <span>Total</span>
                                 <span>${(order.amount || 0).toFixed(2)}</span>

@@ -68,11 +68,11 @@ export async function POST(request: Request) {
             paypal_manual_capture: false, // true for test
             amount: order.amount,
             tax_amount: order.tax_amount || 0,
-            // discount_amount: order.discount_amount || 0,
+            discount_amount: order.discount_amount || 0,
             currency: order.currency || 'USD',
             subtotal: order.subtotal,
-            shipping_name: "Free",
-            shipping_fee: order.shipping_fee || 0,
+            // shipping_name: "Fast Shipping",
+            // shipping_fee: order.shipping_fee || 0,
             order_lines: order.order_lines?.map(line => ({
                 quantity: line.quantity,
                 key: line.sku,
