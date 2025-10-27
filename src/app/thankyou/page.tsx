@@ -200,12 +200,6 @@ function ThankYouContent() {
                                     <span className="text-gray-900">${order.tip_price.toFixed(2)}</span>
                                 </div>
                             )}
-                                {order.currency && (
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Currency</span>
-                                        <span className="text-gray-900">{order.currency}</span>
-                                    </div>
-                                )}
                             <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                                 <span>Total</span>
                                 <span>${(order.amount || 0).toFixed(2)}</span>
