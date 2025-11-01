@@ -65,6 +65,7 @@ export async function POST(request: Request) {
         // Lấy origin từ headers
         const origin = request.headers.get("origin") || `https://${request.headers.get("host")}`;
         const requestBody = {
+            payment_method_types: ['card'], // replace with any other payment methods you want to support
             paypal_manual_capture: false, // true for test
             amount: order.amount,
             tax_amount: order.tax_amount || 0,
