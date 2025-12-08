@@ -7,6 +7,6 @@ export const Payment_api_url = 'https://onecheckout.sandbox.whatee.io/api/v1.0/o
 export const Payment_api_key = 'DZkRXORebFa7uc5S6ehpQI4mCaI9X6788mkpEibGYAf41wNd8OmdP0PjLPvoCX1INxuGvfK24JZLkMWiQLptg9PBU8KzrUwcuLUgdhAmEuGYL9bfcd3xEVzROgCc5IGT';
 
 // export const Payment_js_src = 'http://localhost:3000/checkout-page/sdk.js'
-// export const Payment_merchant_id = '1d0ee9e6-d47e-43bc-aec8-b4665bde839b';
+// export const Payment_merchant_id = '264f4a18-ba70-4038-ae18-39f5bd94f014';
 // export const Payment_api_url = 'http://localhost:9000/api/v1.0/orders';
-// export const Payment_api_key = 'X5M54uzPOVPGmi1UUB9Dh8aZzikmefZOMxgOAMIk4Q1gKaBSyyNngNUC35y51hqarVRfoiCfNS0TOlw5WqT3U7EfCN1e15miszvSl6Ya9WTViZaO0602H6nJswQDMNdE';
+// export const Payment_api_key = 'wZ5PyIDyrHHoWmwtiA7J39NlTPXpInTnSl9Z5PVNLJ9ESNYauohcUA4YoFWNEyWyba7q2CGZPMU8896x668j7e5tdhsQpg22WzjG5hc3IGylndpZ21LHHcmmn87lSAqF';
