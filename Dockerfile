@@ -16,6 +16,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 COPY package.json ./
+RUN bun add -d typescript @types/node @types/react @types/react-dom
 RUN bun install --production --ignore-scripts --prefer-offline
 COPY --from=build /app/next.config.ts ./
 COPY --from=build /app/public ./public
