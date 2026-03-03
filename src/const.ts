@@ -8,9 +8,9 @@
 
 
 export const Payment_js_src = 'https://game.sandbox.whatee.store/checkout-page/sdk.js'
-export const Payment_merchant_id = '4dd35c09-20cf-4f0e-b565-6e0fc2623e0e';
+export const Payment_merchant_id = 'f7f50aea-2e0b-4e6f-82a0-62d791dad60c';
 export const Payment_api_url = 'https://onecheckout.sandbox.whatee.io/api/v1.0/orders';
-export const Payment_api_key = 'e9zGiZq54HqkCVaYTP13dAxjnEbjYFBucYth9YI0Q0ltJQ2YU2gWN60vnxvJ9WcAsq6EV6L3b4qvMwz3QgxMG3H4INBHFGdjaSE6JrJ40hJc7HV0rdgm7A5GDTGWRvYH';
+export const Payment_api_key = 'o1yIBbnhzu9TliCRObOmm2DuSwiDttvYDU0XP40Ab7i2stoiSnPJ5TQM3mz9eqPwqjlR9eEXyzz9tP04QbAKa1QruLQzNiDkHqrMwQT4thyk9OAJX8I1p6wVyqHSXpyz';
 
 // export const Payment_js_src = 'http://localhost:3000/checkout-page/sdk.js'
 // export const Payment_merchant_id = '264f4a18-ba70-4038-ae18-39f5bd94f014';
